@@ -1,3 +1,9 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT%20(Free)-brightgreen.svg)](https://github.com/phphleb/hleb/blob/master/LICENSE)
+![PHP](https://img.shields.io/badge/PHP-^7.2-blue)
+![PHP](https://img.shields.io/badge/PHP-8-blue)
+[![build](https://github.com/phphleb/webrotor/actions/workflows/build.yml/badge.svg?event=push)](https://github.com/phphleb/webrotor/actions/workflows/build.yml)
+
+
 <div align="center">
 <h1>WebRotor&nbsp;</h1>
   <img src="https://raw.githubusercontent.com/phphleb/webrotor/d1af3115f767cce34ea80da697f4847ec0ae3db9/webrotor-300x300-logo.png" alt="WebRotor Logo" width="300">
@@ -10,6 +16,8 @@ A web server designed to enable asynchronous request processing for shared hosti
 <br><br>
 Supports PHP versions 7.2 and higher.
 </div>
+
+
 
 ## Overview
 
@@ -168,3 +176,6 @@ This will initiate a single worker for the duration specified in the configurati
 If the worker is not running or has been disabled, your project will still function, but requests will be processed in the standard, non-synchronous mode.
 As a result, using workers is optional for local development.
 
+----------
+
+[![Telegram](https://img.shields.io/badge/-Telegram-black?color=white&logo=telegram&style=social)](https://t.me/phphleb)
