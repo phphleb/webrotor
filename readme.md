@@ -1,4 +1,12 @@
 <div align="center">
+
+[![License: MIT](https://img.shields.io/badge/License-MIT%20(Free)-brightgreen.svg)](https://github.com/phphleb/hleb/blob/master/LICENSE)
+![PHP](https://img.shields.io/badge/PHP-^7.2-blue)
+![PHP](https://img.shields.io/badge/PHP-8-blue)
+[![build](https://github.com/phphleb/webrotor/actions/workflows/build.yml/badge.svg?event=push)](https://github.com/phphleb/webrotor/actions/workflows/build.yml)
+</div>
+
+<div align="center">
 <h1>WebRotor&nbsp;</h1>
   <img src="https://raw.githubusercontent.com/phphleb/webrotor/be4645b38e31123a2eceb82556ac331af4b76aa5/webrotor-300x300-logo.png" alt="WebRotor Logo" width="300">
 </div><br><br>
@@ -10,13 +18,6 @@ A web server designed to enable asynchronous request processing for shared hosti
 <br><br>
 Supports PHP versions 7.2 and higher.
 </div>
-
----------
-
-[![License: MIT](https://img.shields.io/badge/License-MIT%20(Free)-brightgreen.svg)](https://github.com/phphleb/hleb/blob/master/LICENSE)
-![PHP](https://img.shields.io/badge/PHP-^7.2-blue)
-![PHP](https://img.shields.io/badge/PHP-8-blue)
-[![build](https://github.com/phphleb/webrotor/actions/workflows/build.yml/badge.svg?event=push)](https://github.com/phphleb/webrotor/actions/workflows/build.yml)
 
 
 ## Overview
@@ -177,5 +178,9 @@ If the worker is not running or has been disabled, your project will still funct
 As a result, using workers is optional for local development.
 
 ----------
+<div align="center"><br>
 
 [![Telegram](https://img.shields.io/badge/-Telegram-black?color=white&logo=telegram&style=social)](https://t.me/phphleb)
+
+</div><br>
+
