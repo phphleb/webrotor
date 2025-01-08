@@ -1,0 +1,63 @@
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+name: tests
+
+jobs:
+  tests:
+    name: PHP-${{ matrix.php }}-${{ matrix.os }}
+
+    env:
+      extensions: json, pdo, xml
+      TARGET_DIR: ${{ github.workspace }}/wr-php${{ matrix.php }}-${{ matrix.os }}
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+
+        php:
+          - "7.2"
+          - "7.3"
+          - "7.4"
+          - "8.0"
+          - "8.1"
+          - "8.2"
+          - "8.3"
+          - "8.4"
+
+    steps:
+      - name: Install PHP with extensions
+        uses: shivammathur/setup-php@v2
+
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: ${{ env.extensions }}
+          ini-values: date.timezone='UTC'
+          coverage: none
+          tools: composer:v2
+
+      - name: Check PHP
+        run: php -v
+
+      - name: Create new directory for PHP version
+        run: mkdir -p "${{ env.TARGET_DIR }}"
+
+      - name: Install tests
+        run:  cd ${{ env.TARGET_DIR }} && composer require phphleb/webrotor-tests --with-dependencies
+
+      - name: Copy composer.json
+        run: cd ${{ env.TARGET_DIR }} && cp -p vendor/phphleb/webrotor-tests/composer.json.dev ./composer.json && composer install
+
+      - name: Copy config
+        run: cp -p ${{ env.TARGET_DIR }}/vendor/phphleb/webrotor-tests/phpunit.xml ${{ env.TARGET_DIR }}/phpunit.xml
+
+      - name: Composer autoload
+        run:  cd ${{ env.TARGET_DIR }} && composer dump-autoload
+
+      - name: Run tests
+        run: php ${{ env.TARGET_DIR }}/vendor/bin/phpunit --configuration=${{ env.TARGET_DIR }}/phpunit.xml --testsuite start

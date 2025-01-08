@@ -1,0 +1,33 @@
+{
+    "name": "phphleb/webrotor",
+    "description": "Asynchronous Web server for shared hosting",
+    "type": "project",
+    "keywords": [
+        "framework",
+        "php",
+        "laravel",
+        "slim",
+        "web-server",
+        "php"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Foma Tuturov",
+            "email": "fomiash@yandex.ru"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.0",
+        "psr/log": "@stable"
+    },
+    "require-dev": {
+        "roave/security-advisories": "dev-latest",
+        "phpstan/phpstan": "^1.12"
+    },
+    "autoload": {
+        "psr-4": {
+            "Phphleb\\WebRotor\\": "/"
+        }
+    }
+}

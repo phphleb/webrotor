@@ -1,0 +1,200 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Phphleb\WebRotor\Src\Process;
+
+use Iterator;
+use Phphleb\WebRotor\Src\Exceptions\WebRotorException;
+use Phphleb\WebRotor\Src\Handler\Psr7Converter;
+use Phphleb\WebRotor\Src\InternalConfig;
+use Phphleb\WebRotor\Src\Storage\StorageInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\StreamInterface;
+use Psr\Log\LoggerInterface;
+use Throwable;
+
+/**
+ * @author Foma Tuturov <fomiash@yandex.ru>
+ *
+ * @internal
+ *
+ * @implements Iterator<string, ServerRequestInterface>
+ */
+class RequestIterator implements Iterator
+{
+    /**
+     * @var string
+     */
+    private $tag = '';
+
+    /**
+     * @var ServerRequestInterface
+     */
+    private $request = null;
+
+    /**
+     * @var StorageInterface
+     */
+    private $storage;
+
+    /**
+     * @var InternalConfig
+     */
+    private $config;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var Psr7Converter
+     */
+    private $converter;
+
+    public function __construct(
+        StorageInterface $storage,
+        InternalConfig   $config,
+        Psr7Converter    $converter,
+        LoggerInterface  $logger
+    )
+    {
+        $this->storage = $storage;
+        $this->config = $config;
+        $this->logger = $logger;
+        $this->converter = $converter;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function current(): ServerRequestInterface
+    {
+        return $this->request;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function next(): void
+    {
+        $this->tag = '';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function key(): string
+    {
+        return $this->tag;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function valid(): bool
+    {
+        return $this->search();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function rewind(): void
+    {
+        $this->tag = '';
+    }
+
+    /**
+     * Search raw requests data.
+     */
+    private function search(): bool
+    {
+        $id = $this->config->getCurrentWorkerId();
+        $start = $this->config->getStartUnixTime();
+        $max = $this->config->getWorkerLifetimeSec();
+
+        while (true) {
+            $requestKeys = $this->storage->keys(Worker::REQUEST_TYPE);
+            $responseKeys = $this->storage->keys(Worker::RESPONSE_TYPE);
+
+            $time = microtime(true);
+
+            if ($time >= $start + $max) {
+                $this->logger->debug('(W) Worker #{id} lifetime has expired and the process is terminated.', ['id' => $id]);
+                return false;
+            }
+
+            [$requestKeys, $responseKeys] = WorkerHelper::sortRawKeys($requestKeys, $responseKeys, $id);
+
+            $unprocessed = array_diff($requestKeys, $responseKeys);
+
+            if (!$unprocessed) {
+                continue;
+            }
+            $time = microtime(true);
+            foreach ($unprocessed as $key => $item) {
+                if (WorkerHelper::checkIsOlder($item, Worker::REQUEST_TYPE, $time)) {
+                    unset($unprocessed[$key]);
+                }
+            }
+            if (!$unprocessed) {
+                continue;
+            }
+            // Processing starts with the oldest requests.
+            sort($unprocessed);
+            $tag = current($unprocessed);
+            $this->tag = $tag;
+
+            $this->logger->debug("Request {tag} for worker detected.", ['tag' => $tag]);
+
+            $data = $this->storage->get($tag, Worker::REQUEST_TYPE);
+            $this->logger->debug('The {tag} tag has been received for processing and is being removed from the storage.', ['tag' => $tag]);
+            $this->storage->delete($tag, Worker::REQUEST_TYPE);
+            $responseTag = $responseKeys[$tag] ?? null;
+            if ($responseTag && !$this->config->isDebug()) {
+                $this->storage->delete($responseTag, Worker::RESPONSE_TYPE);
+            }
+            if (!$data) {
+                $this->logger->error('Failed to receive request data by worker for ' . $tag);
+            }
+            $array = [];
+            try {
+                /**
+                 * @var null|array{
+                 *      serverParams: array<string, mixed>,
+                 *      headers: string[][],
+                 *      body: string,
+                 *      version: string,
+                 *      uri: string,
+                 *      method: string,
+                 *      attributes: array{
+                 *          session: array<string, mixed>,
+                 *          sessionId: string,
+                 *          sessionName: string,
+                 *          cookie: array<string, mixed>,
+                 *          get: array<string, mixed>,
+                 *          post: array<string, mixed>,
+                 *          env: array<string, mixed>,
+                 *          files: array<string, mixed>
+                 *      }
+                 *  } $array
+                 */
+                $array = json_decode((string)$data, true);
+                if ($array) {
+                    $this->request = $this->converter->convertArrayToServerRequest($array);
+                }
+            } catch (Throwable $t) {
+                $this->logger->error("(A) Failed to convert data to response object for {tag}. " . $t, ['tag' => $tag]);
+            }
+            if (!$array) {
+                $this->logger->error('(W) The found request {tag} could not be converted.', ['tag' => $tag]);
+                continue;
+            }
+            $this->logger->debug("Request {tag} received successfully.", ['tag' => $tag]);
+
+            return true;
+        }
+    }
+}
