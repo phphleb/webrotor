@@ -6,7 +6,7 @@
 
 <div align="center">
 <h1>WebRotor&nbsp;</h1>
-  <img src="https://raw.githubusercontent.com/phphleb/webrotor/d1af3115f767cce34ea80da697f4847ec0ae3db9/webrotor-300x300-logo.png" alt="WebRotor Logo" width="300">
+  <img src="https://raw.githubusercontent.com/phphleb/webrotor/be4645b38e31123a2eceb82556ac331af4b76aa5/webrotor-300x300-logo.png" alt="WebRotor Logo" width="300">
 </div><br>
 
 
