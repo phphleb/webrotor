@@ -1,13 +1,7 @@
-[![License: MIT](https://img.shields.io/badge/License-MIT%20(Free)-brightgreen.svg)](https://github.com/phphleb/hleb/blob/master/LICENSE)
-![PHP](https://img.shields.io/badge/PHP-^7.2-blue)
-![PHP](https://img.shields.io/badge/PHP-8-blue)
-[![build](https://github.com/phphleb/webrotor/actions/workflows/build.yml/badge.svg?event=push)](https://github.com/phphleb/webrotor/actions/workflows/build.yml)
-
-
 <div align="center">
 <h1>WebRotor&nbsp;</h1>
   <img src="https://raw.githubusercontent.com/phphleb/webrotor/be4645b38e31123a2eceb82556ac331af4b76aa5/webrotor-300x300-logo.png" alt="WebRotor Logo" width="300">
-</div><br>
+</div><br><br>
 
 
 
@@ -17,6 +11,12 @@ A web server designed to enable asynchronous request processing for shared hosti
 Supports PHP versions 7.2 and higher.
 </div>
 
+---------
+
+[![License: MIT](https://img.shields.io/badge/License-MIT%20(Free)-brightgreen.svg)](https://github.com/phphleb/hleb/blob/master/LICENSE)
+![PHP](https://img.shields.io/badge/PHP-^7.2-blue)
+![PHP](https://img.shields.io/badge/PHP-8-blue)
+[![build](https://github.com/phphleb/webrotor/actions/workflows/build.yml/badge.svg?event=push)](https://github.com/phphleb/webrotor/actions/workflows/build.yml)
 
 
 ## Overview
