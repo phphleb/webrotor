@@ -1,0 +1,6 @@
+# Autodetect text files
+* text=auto eol=lf
+
+# Ignoring files when archiving a project
+.gitattributes        export-ignore
+/.github              export-ignore
