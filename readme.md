@@ -1,6 +1,6 @@
 <div align="center">
 
-[![License: MIT](https://img.shields.io/badge/License-MIT%20(Free)-brightgreen.svg)](https://github.com/phphleb/hleb/blob/master/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT%20(Free)-darkgreen.svg)](https://github.com/phphleb/hleb/blob/master/LICENSE)
 ![PHP](https://img.shields.io/badge/PHP-^7.2-blue)
 ![PHP](https://img.shields.io/badge/PHP-8-blue)
 [![build](https://github.com/phphleb/webrotor/actions/workflows/build.yml/badge.svg?event=push)](https://github.com/phphleb/webrotor/actions/workflows/build.yml)
