@@ -53,11 +53,12 @@ jobs:
 
       - name: Copy config
         run: |
-            if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-              cp -p ${{ env.TARGET_DIR }}/vendor/phphleb/webrotor-tests/phpunit.xml ${{ env.TARGET_DIR }}/phpunit.xml
-            else
-              Copy-Item ${{ env.TARGET_DIR }}\vendor\phphleb\webrotor-tests\phpunit.xml ${{ env.TARGET_DIR }}\phpunit.xml
-        shell: bash
+          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+            cp -p ${{ env.TARGET_DIR }}/vendor/phphleb/webrotor-tests/phpunit.xml ${{ env.TARGET_DIR }}/phpunit.xml
+          elif [ "${{ matrix.os }}" == "windows-latest" ]; then
+            Copy-Item -Path "${{ env.TARGET_DIR }}\\vendor\\phphleb\\webrotor-tests\\phpunit.xml" -Destination "${{ env.TARGET_DIR }}\\phpunit.xml"
+          fi
+      
 
       - name: Composer autoload
         run:  cd ${{ env.TARGET_DIR }} && composer dump-autoload
