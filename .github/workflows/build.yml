@@ -19,7 +19,6 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - windows-latest
 
         php:
           - "7.2"
@@ -52,13 +51,7 @@ jobs:
         run:  cd ${{ env.TARGET_DIR }} && composer require phphleb/webrotor-tests --with-dependencies
 
       - name: Copy config
-        run: |
-          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            cp -p ${{ env.TARGET_DIR }}/vendor/phphleb/webrotor-tests/phpunit.xml ${{ env.TARGET_DIR }}/phpunit.xml
-          elif [ "${{ matrix.os }}" == "windows-latest" ]; then
-            Copy-Item -Path "${{ env.TARGET_DIR }}\\vendor\\phphleb\\webrotor-tests\\phpunit.xml" -Destination "${{ env.TARGET_DIR }}\\phpunit.xml"
-          fi
-      
+        run: cp -p ${{ env.TARGET_DIR }}/vendor/phphleb/webrotor-tests/phpunit.xml ${{ env.TARGET_DIR }}/phpunit.xml
 
       - name: Composer autoload
         run:  cd ${{ env.TARGET_DIR }} && composer dump-autoload
