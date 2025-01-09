@@ -96,6 +96,11 @@ final class WebRotor
     private $isWorker;
 
     /**
+     * @var string|null
+     */
+    private $searchTag = null;
+
+    /**
      * @param Config|null $config - a configuration object with non-standard settings.
      * @param LoggerInterface|null $logger - implementation of a custom logger.
      * @param array<string, array<int, string>|null> $globals - defining additional global variable.
@@ -228,6 +233,7 @@ final class WebRotor
              * @var string $tag
              */
             [$tag, $request] = $this->process->setCurrentRequest();
+            $this->searchTag = $tag;
             if (empty($request)) {
                 return [];
             }
@@ -256,6 +262,7 @@ final class WebRotor
 
             // Processing the requests in worker mode.
             foreach($this->process->getRequests() as $tag => $request) {
+                $start = microtime(true);
                 try {
                     /**
                      * @var ResponseInterface $response - the result of executing application code.
@@ -271,6 +278,7 @@ final class WebRotor
                 /** @var ServerRequestInterface $request */
                 $this->process->setResponse($tag, $response, $request);
                 $this->output->setResponse($response);
+                $this->process->logStat($tag, $start);
             }
         } else {
             // If the worker was unable to process the request,
@@ -287,6 +295,7 @@ final class WebRotor
                 $response = $this->process->getErrorResponse($this->config->isDebug() ? (string)$t : '');
                 $this->process->sendStandardLog($request, $response, $t);
             }
+            $this->process->logStat($this->searchTag ?? 'undefined');
             $this->output->run($this->process->handleResponse($request, $response));
         }
         return $this->output->getResult();

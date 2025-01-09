@@ -241,6 +241,8 @@ class Worker
 
             $output->run($response);
 
+            $this->logStat($tag);
+
             return $output->getResult();
         }
         $this->logger->warning('(A->S) The timeout for a response from the worker has expired. Emergency switch to standard mode.');
@@ -278,6 +280,17 @@ class Worker
     public function handleResponse(ServerRequestInterface $request, ResponseInterface $response): array
     {
         return $this->converter->convertResponseToArray($response, $request);
+    }
+
+    /**
+     * Saving the final statistics to the log.
+     */
+    public function logStat(string $tag, ?float $start = null): void
+    {
+        if ($start === null) {
+            $start = $this->config->getStartUnixTime();
+        }
+        LoggerManager::logStatistics($tag, $start, $this->config, $this->logger);
     }
 
     /**

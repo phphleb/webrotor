@@ -19,11 +19,6 @@ final class FileStorage implements StorageInterface
     private $directory;
 
     /**
-     * @var bool
-     */
-    private $storageDirExists = false;
-
-    /**
      * @var array<string, bool>
      */
     private $subdirectoryExists = [];
@@ -57,10 +52,10 @@ final class FileStorage implements StorageInterface
     public function set(string $key, string $type, string $value): void
     {
         $dir = $this->directory . DIRECTORY_SEPARATOR . $type;
-        if (!$this->storageDirExists && !is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) {
+        if (empty($this->subdirectoryExists[$type]) && !is_dir($dir) && !@mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new WebRotorException(sprintf('Directory "%s" was not created', $dir));
         }
-        $this->storageDirExists = true;
+        $this->subdirectoryExists[$type] = true;
 
         $file = $dir . DIRECTORY_SEPARATOR . $key . '.json';
         @file_put_contents($file, $value, LOCK_EX|LOCK_SH);

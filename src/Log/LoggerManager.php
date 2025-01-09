@@ -7,6 +7,7 @@ namespace Phphleb\WebRotor\Src\Log;
 use Phphleb\WebRotor\Src\InternalConfig;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * @author Foma Tuturov <fomiash@yandex.ru>
@@ -45,6 +46,24 @@ final class LoggerManager
                 'lifetime' => $config->getWorkerLifetimeSec()
             ]
         ];
+    }
+
+    /**
+     * Saving the final statistics to the log.
+     */
+    public static function logStatistics(string $tag, float $start, InternalConfig $config, LoggerInterface $logger): void
+    {
+        if ($config->isWorker()) {
+            $message = "(A) Statistics: Worker #{id} request {tag} execution time {time}s";
+            $logger->info($message, [
+                'tag' => $tag,
+                'time' => microtime(true) - $start,
+                'id' => $config->getCurrentWorkerId()
+            ]);
+            return;
+        }
+        $message = "(S) Statistics: Total request {tag} execution time {time}s";
+        $logger->info($message, ['tag' => $tag, 'time' => microtime(true) - $start]);
     }
 
     /**
