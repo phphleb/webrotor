@@ -19,6 +19,7 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
+          - windows-latest
 
         php:
           - "7.2"
@@ -56,5 +57,11 @@ jobs:
       - name: Composer autoload
         run:  cd ${{ env.TARGET_DIR }} && composer dump-autoload
 
-      - name: Run tests
+      - name: Run start tests
         run: php ${{ env.TARGET_DIR }}/vendor/bin/phpunit --configuration=${{ env.TARGET_DIR }}/phpunit.xml --testsuite start
+
+      - name: Run unit tests
+        run: php ${{ env.TARGET_DIR }}/vendor/bin/phpunit --configuration=${{ env.TARGET_DIR }}/phpunit.xml --testsuite unit
+
+      - name: Run feature tests
+        run: php ${{ env.TARGET_DIR }}/vendor/bin/phpunit --configuration=${{ env.TARGET_DIR }}/phpunit.xml --testsuite feature
