@@ -52,7 +52,12 @@ jobs:
         run:  cd ${{ env.TARGET_DIR }} && composer require phphleb/webrotor-tests --with-dependencies
 
       - name: Copy config
-        run: cp -p ${{ env.TARGET_DIR }}/vendor/phphleb/webrotor-tests/phpunit.xml ${{ env.TARGET_DIR }}/phpunit.xml
+        run: |
+            if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+              cp -p ${{ env.TARGET_DIR }}/vendor/phphleb/webrotor-tests/phpunit.xml ${{ env.TARGET_DIR }}/phpunit.xml
+            else
+              Copy-Item ${{ env.TARGET_DIR }}\vendor\phphleb\webrotor-tests\phpunit.xml ${{ env.TARGET_DIR }}\phpunit.xml
+        shell: bash
 
       - name: Composer autoload
         run:  cd ${{ env.TARGET_DIR }} && composer dump-autoload
