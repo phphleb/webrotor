@@ -50,9 +50,6 @@ jobs:
       - name: Install tests
         run:  cd ${{ env.TARGET_DIR }} && composer require phphleb/webrotor-tests --with-dependencies
 
-      - name: Copy composer.json
-        run: cd ${{ env.TARGET_DIR }} && cp -p vendor/phphleb/webrotor-tests/composer.json.dev ./composer.json && composer install
-
       - name: Copy config
         run: cp -p ${{ env.TARGET_DIR }}/vendor/phphleb/webrotor-tests/phpunit.xml ${{ env.TARGET_DIR }}/phpunit.xml
 
