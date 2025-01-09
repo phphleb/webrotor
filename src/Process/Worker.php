@@ -239,9 +239,9 @@ class Worker
             ];
             $this->logger->info(...$info);
 
-            $output->run($response);
-
             $this->logStat($tag);
+
+            $output->run($response);
 
             return $output->getResult();
         }
