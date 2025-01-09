@@ -22,12 +22,13 @@
         "psr/log": "@stable"
     },
     "require-dev": {
-        "roave/security-advisories": "dev-latest",
         "phpstan/phpstan": "^1.12"
     },
     "autoload": {
-        "psr-4": {
-            "Phphleb\\WebRotor\\": "/"
-        }
+        "classmap": [
+            "src/",
+            "WebRotor.php",
+            "Config.php"
+        ]
     }
 }
