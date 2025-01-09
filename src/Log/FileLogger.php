@@ -55,7 +55,7 @@ final class FileLogger extends AbstractLogger
             return;
         }
 
-        if (!$this->logDirExists && !is_dir($logDirectory) && !@mkdir($logDirectory, 0755, true) && !is_dir($logDirectory)) {
+        if (!$this->logDirExists && !is_dir($logDirectory) && !@mkdir($logDirectory, 0777, true) && !is_dir($logDirectory)) {
             throw new WebRotorException(sprintf('Directory "%s" was not created', $logDirectory));
         }
         $this->logDirExists = true;
