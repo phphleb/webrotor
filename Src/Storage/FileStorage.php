@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Phphleb\Webrotor\Src\Storage;
 
-use Phphleb\Webrotor\Src\Exceptions\WebrotorException;
-use Phphleb\Webrotor\Src\Exceptions\WebrotorInvalidArgumentException;
+use Phphleb\Webrotor\Src\Exceptions\WebRotorException;
+use Phphleb\Webrotor\Src\Exceptions\WebRotorInvalidArgumentException;
 use Throwable;
 
 /**

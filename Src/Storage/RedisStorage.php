@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Phphleb\WebRotor\Src\Storage;
+namespace Phphleb\Webrotor\Src\Storage;
 
 use Redis;
 use RedisException;

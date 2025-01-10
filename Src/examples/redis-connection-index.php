@@ -2,11 +2,11 @@
 // Contents of your index.php file.
 // Connecting to Redis using the PHP `predis` extension.
 
-use Phphleb\WebRotor\Src\Handler\NyholmPsr7Creator;
+use Phphleb\Webrotor\Src\Handler\NyholmPsr7Creator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Phphleb\Webrotor\WebRotor;
-use Phphleb\WebRotor\Src\Storage\RedisStorage;
+use Phphleb\Webrotor\Src\Storage\RedisStorage;
 
 require __DIR__ . '/../vendor/autoload.php';
 

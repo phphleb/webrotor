@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Phphleb\WebRotor\Src\Middlewares;
+namespace Phphleb\Webrotor\Src\Middlewares;
 
 /**
  * @author Foma Tuturov <fomiash@yandex.ru>

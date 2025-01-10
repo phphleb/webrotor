@@ -7,7 +7,7 @@ namespace Phphleb\Webrotor\Src\Log;
 use DateTime;
 use DateTimeZone;
 use Exception;
-use Phphleb\Webrotor\Src\Exceptions\WebrotorException;
+use Phphleb\Webrotor\Src\Exceptions\WebRotorException;
 use Phphleb\Webrotor\Src\InternalConfig;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;

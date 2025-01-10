@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Phphleb\Webrotor;
 
-use Phphleb\Webrotor\Src\Exceptions\WebrotorConfigException;
-use Phphleb\Webrotor\Src\Exceptions\WebrotorException;
+use Phphleb\Webrotor\Src\Exceptions\WebRotorConfigException;
+use Phphleb\Webrotor\Src\Exceptions\WebRotorException;
 use Phphleb\Webrotor\Src\Handler\Psr7Converter;
 use Phphleb\Webrotor\Src\Handler\Psr7CreatorInterface;
 use Phphleb\Webrotor\Src\InternalConfig;

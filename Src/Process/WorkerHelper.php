@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Phphleb\Webrotor\Src\Process;
 
-use Phphleb\Webrotor\Src\Exceptions\WebrotorException;
+use Phphleb\Webrotor\Src\Exceptions\WebRotorException;
 
 /**
  * @author Foma Tuturov <fomiash@yandex.ru>
