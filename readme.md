@@ -94,9 +94,18 @@ Now for the fun part! :) Shared hosting is unlikely to allow you to daemonize pr
 First, find the section in your hosting admin panel named something like "Task Scheduler" or "crontab."
 A simple example would be launching two workers, each with a lifespan of two minutes.
 We'll use the same index file (`index.php`) as our worker, specifying the worker number.
-The following example shows two workers that launch every two minutes with a one-minute offset.
-The implementation can vary depending on your hosting settings, but if you encounter any issues, try launching just the first worker to start with, or contact your hosting support and show them this example.
 
+
+```bash
+# Runs the first command every two minutes
+*/2 * * * * /usr/local/bin/php7.2 /my-project/public_html/index.php --id=1
+
+# Runs the second command every two minutes
+*/2 * * * * /usr/local/bin/php7.2 /my-project/public_html/index.php --id=2
+```
+
+The following example shows two workers that launch every two minutes with a one-minute offset.
+The implementation can vary depending on your hosting settings, but if you encounter any issues, try using just the first example, or contact your hosting support and show them this example.
 
 ```bash
 # Runs the first command every two minutes
@@ -164,6 +173,11 @@ $server->run(function(ServerRequestInterface $request, ResponseInterface $respon
 });
 ```
 
+### Virtual Server or Dedicated Server
+
+With broader access to the server environment, there's the potential to replace the current worker data storage with a Redis-based storage to maximize performance. An example of such a setup can be found in the `Src/examples` folder.
+
+
 ### Local Development
 
 For local development, there's no need to modify the previous setup. Simply run the following command from the project's public directory:
@@ -176,6 +190,7 @@ php index.php
 This will initiate a single worker for the duration specified in the configuration.  
 If the worker is not running or has been disabled, your project will still function, but requests will be processed in the standard, non-synchronous mode.
 As a result, using workers is optional for local development.
+
 
 ----------
 <div align="center"><br>
