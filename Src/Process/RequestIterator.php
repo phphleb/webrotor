@@ -24,6 +24,8 @@ class RequestIterator implements Iterator
 {
     public const MAX_REQUESTS_TO_START_WORKER = 3;
 
+    protected const PAUSE = 1000;
+
     /**
      * @var string
      */
@@ -148,6 +150,7 @@ class RequestIterator implements Iterator
             $unprocessed = array_diff($requestKeys, $responseKeys);
 
             if (!$unprocessed) {
+                usleep(self::PAUSE);
                 continue;
             }
             $time = microtime(true);
@@ -157,6 +160,7 @@ class RequestIterator implements Iterator
                 }
             }
             if (!$unprocessed) {
+                usleep(self::PAUSE);
                 continue;
             }
             // Processing starts with the oldest requests.
@@ -207,6 +211,7 @@ class RequestIterator implements Iterator
             }
             if (!$array) {
                 $this->logger->error('(W) The found request {tag} could not be converted.', ['tag' => $tag]);
+                usleep(self::PAUSE);
                 continue;
             }
             $this->logger->debug("Request {tag} received successfully.", ['tag' => $tag]);

@@ -13,6 +13,8 @@ use Phphleb\Webrotor\Src\Storage\StorageInterface;
  */
 class ResponseSearchEngine
 {
+    protected const PAUSE = 1000;
+
     /**
      * @var string
      */
@@ -85,6 +87,7 @@ class ResponseSearchEngine
             }
             $response = $this->storage->get($tag, Worker::RESPONSE_TYPE);
             if ($response === null) {
+                usleep(self::PAUSE);
                 continue;
             }
             if (!$response) {
