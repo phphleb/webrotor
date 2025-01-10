@@ -1,11 +1,12 @@
 {
     "name": "phphleb/webrotor",
-    "description": "Asynchronous Web server for shared hosting",
+    "description": "Asynchronous PHP web server for shared hosting",
     "type": "project",
     "keywords": [
         "framework",
         "php",
         "laravel",
+        "symfony",
         "slim",
         "web-server",
         "php"
@@ -19,7 +20,8 @@
     ],
     "require": {
         "php": ">=7.2.0",
-        "psr/log": "@stable"
+        "psr/log": "@stable",
+        "ext-json": "*"
     },
     "require-dev": {
         "phpstan/phpstan": "^1.12"
