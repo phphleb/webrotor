@@ -8,6 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Phphleb\Webrotor\WebRotor;
 use Phphleb\Webrotor\Src\Storage\RedisStorage;
 
+// This should be the correct path to the autoload file.
 require __DIR__ . '/../vendor/autoload.php';
 
 $redis = new \Redis();
@@ -24,7 +25,7 @@ $server = (new WebRotor())->setStorage($storage);
 $server->init($psr7Creator);
 
 $server->run(function(ServerRequestInterface $request, ResponseInterface $response) {
-
+    // ... //
     $response->getBody()->write('I use Redis as storage!');
 
     return $response;
