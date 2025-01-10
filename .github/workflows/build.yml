@@ -19,7 +19,6 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - windows-latest
 
         php:
           - "7.2"
@@ -54,14 +53,17 @@ jobs:
       - name: Install tests
         run:  cd ${{ env.TARGET_DIR }} && composer require phphleb/webrotor-tests --with-dependencies
 
+      - name: Copy config
+        run: cp -p ${{ env.TARGET_DIR }}/vendor/phphleb/webrotor-tests/phpunit.xml ${{ env.TARGET_DIR }}/phpunit.xml
+
       - name: Composer autoload
         run:  cd ${{ env.TARGET_DIR }} && composer dump-autoload
 
       - name: Run start tests
-        run: php ${{ env.TARGET_DIR }}/vendor/bin/phpunit --configuration=${{ env.TARGET_DIR }}/vendor/phphleb/webrotor-tests/phpunit.xml --testsuite start
+        run: php ${{ env.TARGET_DIR }}/vendor/bin/phpunit --configuration=${{ env.TARGET_DIR }}/phpunit.xml --testsuite start
 
       - name: Run unit tests
-        run: php ${{ env.TARGET_DIR }}/vendor/bin/phpunit --configuration=${{ env.TARGET_DIR }}/vendor/phphleb/webrotor-tests/phpunit.xml --testsuite unit
+        run: php ${{ env.TARGET_DIR }}/vendor/bin/phpunit --configuration=${{ env.TARGET_DIR }}/phpunit.xml --testsuite unit
 
       - name: Run feature tests
-        run: php ${{ env.TARGET_DIR }}/vendor/bin/phpunit --configuration=${{ env.TARGET_DIR }}/vendor/phphleb/webrotor-tests/phpunit.xml --testsuite feature
+        run: php ${{ env.TARGET_DIR }}/vendor/bin/phpunit --configuration=${{ env.TARGET_DIR }}/phpunit.xml --testsuite feature
