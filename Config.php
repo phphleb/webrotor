@@ -103,4 +103,23 @@ final class Config
      * @var string
      */
     public $timeZone = 'UTC';
+
+    /**
+     * The lifetime of the temporary worker in seconds.
+     * If 0 is specified, then the value is equal to the main worker lifetime.
+     *
+     * @var int
+     */
+    public $temporaryWorkerLifetimeSec = 60;
+
+    /**
+     * To create temporary workers, you need to run them with the correct interpreter.
+     * This path will be searched and {version}
+     * will be replaced with the current version.
+     * If the line is empty, temporary workers will not be able
+     * to be created and will be disabled.
+     *
+     * @var string
+     */
+    public $interpreterPathPattern = '/usr/local/bin/php{version}';
 }

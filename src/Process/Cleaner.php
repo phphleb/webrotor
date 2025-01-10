@@ -40,6 +40,9 @@ class Cleaner
      */
     public function cleanOldResources(): void
     {
+        if ($this->config->isTemporaryWorker()) {
+            return;
+        }
         if (rand(0, $this->config->getWorkerNum() + 1) === 1) {
             $this->logger->debug('(A) Starting the process of searching for outdated data.');
             $start = microtime(true);

@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Phphleb\WebRotor\Src\Process;
 
 use Iterator;
-use Phphleb\WebRotor\Src\Exceptions\WebRotorException;
 use Phphleb\WebRotor\Src\Handler\Psr7Converter;
 use Phphleb\WebRotor\Src\InternalConfig;
+use Phphleb\WebRotor\Src\Process\Spawn\TemporaryWorkerCreatorInterface;
 use Phphleb\WebRotor\Src\Storage\StorageInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\StreamInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -23,6 +22,8 @@ use Throwable;
  */
 class RequestIterator implements Iterator
 {
+    public const MAX_REQUESTS_TO_START_WORKER = 3;
+
     /**
      * @var string
      */
@@ -53,17 +54,29 @@ class RequestIterator implements Iterator
      */
     private $converter;
 
+    /**
+     * @var TemporaryWorkerCreatorInterface
+     */
+    private $workerCreator;
+
+    /**
+     * @var int
+     */
+    private $temporaryWorkerCount = 0;
+
     public function __construct(
-        StorageInterface $storage,
-        InternalConfig   $config,
-        Psr7Converter    $converter,
-        LoggerInterface  $logger
+        StorageInterface                $storage,
+        InternalConfig                  $config,
+        Psr7Converter                   $converter,
+        LoggerInterface                 $logger,
+        TemporaryWorkerCreatorInterface $workerCreator
     )
     {
         $this->storage = $storage;
         $this->config = $config;
         $this->logger = $logger;
         $this->converter = $converter;
+        $this->workerCreator = $workerCreator;
     }
 
     /**
@@ -114,6 +127,7 @@ class RequestIterator implements Iterator
         $id = $this->config->getCurrentWorkerId();
         $start = $this->config->getStartUnixTime();
         $max = $this->config->getWorkerLifetimeSec();
+        $tempMax = $this->config->getTemporaryWorkerLifetimeSec() ?: $max;
 
         while (true) {
             $requestKeys = $this->storage->keys(Worker::REQUEST_TYPE);
@@ -121,7 +135,10 @@ class RequestIterator implements Iterator
 
             $time = microtime(true);
 
-            if ($time >= $start + $max) {
+            $this->temporaryWorkerCount or $this->createNewWorkerAsNeeded(count($requestKeys));
+
+            // If the lifetime for a worker or temporary worker has expired, the search ends.
+            if ($time >= $start + ($this->config->isTemporaryWorker() ? $tempMax : $max)) {
                 $this->logger->debug('(W) Worker #{id} lifetime has expired and the process is terminated.', ['id' => $id]);
                 return false;
             }
@@ -195,6 +212,19 @@ class RequestIterator implements Iterator
             $this->logger->debug("Request {tag} received successfully.", ['tag' => $tag]);
 
             return true;
+        }
+    }
+
+    /**
+     * Creates a new temporary worker if there are a lot of unprocessed requests.
+     */
+    private function createNewWorkerAsNeeded(int $requestCount): void
+    {
+        $interpreter = $this->config->getInterpreterPathPattern();
+
+        if ($interpreter && $requestCount > self::MAX_REQUESTS_TO_START_WORKER) {
+            $this->workerCreator->createWorker();
+            $this->temporaryWorkerCount++;
         }
     }
 }

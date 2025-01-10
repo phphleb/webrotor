@@ -14,6 +14,8 @@ use Phphleb\WebRotor\Src\Middlewares\CookieMiddlewareInterface;
 use Phphleb\WebRotor\Src\Middlewares\SessionMiddlewareInterface;
 use Phphleb\WebRotor\Src\Process\Cleaner;
 use Phphleb\WebRotor\Src\Process\Output;
+use Phphleb\WebRotor\Src\Process\Spawn\TemporaryWorkerCreator;
+use Phphleb\WebRotor\Src\Process\Spawn\TemporaryWorkerCreatorInterface;
 use Phphleb\WebRotor\Src\Session\SessionManager;
 use Phphleb\WebRotor\Src\Process\Worker;
 use Phphleb\WebRotor\Src\Log\LoggerManager;
@@ -35,6 +37,8 @@ $argv = $argv ?? null;
 final class WebRotor
 {
     public const ID_ARG = '--id';
+
+    public const TEMPORARY_WORKER_ARG = '--temporary-worker';
 
     public const RUNTIME_DIR = 'wr-runtime';
 
@@ -89,6 +93,11 @@ final class WebRotor
      * @var null|SessionManagerInterface
      */
     private $sessionManager = null;
+
+    /**
+     * @var null|TemporaryWorkerCreatorInterface
+     */
+    private $workerCreator = null;
 
     /**
      * @var bool
@@ -191,9 +200,22 @@ final class WebRotor
     public function setSessionManager(SessionManagerInterface $sessionManager): self
     {
         if ($this->hasInitialized) {
-            throw new WebRotorException('The `setOutput` method cannot be used after initialization');
+            throw new WebRotorException('The `setSessionManager` method cannot be used after initialization');
         }
         $this->sessionManager = $sessionManager;
+
+        return $this;
+    }
+
+    /**
+     * @param TemporaryWorkerCreatorInterface $workerCreator - custom new worker handler.
+     */
+    public function setWorkerCreator(TemporaryWorkerCreatorInterface $workerCreator): self
+    {
+        if ($this->hasInitialized) {
+            throw new WebRotorException('The `setWorkerCreator` method cannot be used after initialization');
+        }
+        $this->workerCreator = $workerCreator;
 
         return $this;
     }
@@ -209,11 +231,13 @@ final class WebRotor
     public function init(Psr7CreatorInterface $psr7Creator): array
     {
         $this->hasInitialized = true;
+        $storage = $this->storage ?? new FileStorage($this->config->getRuntimeDirectory());
         $sessionManager = $this->sessionManager ?? new SessionManager($this->logger, $this->config);
+        $workerCreator = $this->workerCreator ?? new TemporaryWorkerCreator($this->config, $this->logger, $storage);
 
         $this->process = new Worker(
             $this->config,
-            $this->storage ?? new FileStorage($this->config->getRuntimeDirectory()),
+            $storage,
             new Psr7Converter(
                 $psr7Creator,
                 $this->cookie,
@@ -221,7 +245,8 @@ final class WebRotor
                 $sessionManager
             ),
             $this->logger,
-            $sessionManager
+            $sessionManager,
+            $workerCreator
         );
 
         if ($this->isWorker) {
@@ -316,11 +341,27 @@ final class WebRotor
             $logDirectory = $publicDirectory . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . self::LOGS_DIR;
         }
 
+        $isTemporaryWorker = false;
+        $interpreterPathPattern = '';
         if ($this->isWorker) {
+            if ($config->interpreterPathPattern) {
+                $version = preg_replace('/(\d+\.\d+)(\.\d+)?/', '$1', PHP_VERSION);
+                if ($version) {
+                    $interpreterPathPattern = str_replace('{version}', $version, $config->interpreterPathPattern);
+                }
+                if (!is_dir($interpreterPathPattern)) {
+                    $this->logger->error('The path to the interpreter in the configuration is incorrectly specified');
+                }
+            }
             foreach($arguments ?? [] as $arg) {
-                if (strpos($arg, self::ID_ARG . '=') === 0) {
+                if ($arg === self::TEMPORARY_WORKER_ARG) {
+                    $isTemporaryWorker = true;
+                }
+            }
+            foreach($arguments ?? [] as $arg) {
+                  if (strpos($arg, self::ID_ARG . '=') === 0) {
                     $workerId = (int)substr($arg, strlen(self::ID_ARG) + 1);
-                    if ($workerId > $config->workerNum || $workerId < 1) {
+                    if ((!$isTemporaryWorker && $workerId > $config->workerNum) || $workerId < 1) {
                         throw new WebRotorConfigException('The ID of the current worker is not included in the number set in the configuration');
                     }
                 }
@@ -346,7 +387,10 @@ final class WebRotor
             $config->debug,
             $config->logRotationPerDay,
             $config->timeZone,
-            $this->isWorker
+            $this->isWorker,
+            $config->temporaryWorkerLifetimeSec,
+            $isTemporaryWorker,
+            $interpreterPathPattern
         );
     }
 }

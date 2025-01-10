@@ -7,6 +7,7 @@ namespace Phphleb\WebRotor\Src\Process;
 use Phphleb\WebRotor\Src\Handler\Psr7Converter;
 use Phphleb\WebRotor\Src\InternalConfig;
 use Phphleb\WebRotor\Src\Log\LoggerManager;
+use Phphleb\WebRotor\Src\Process\Spawn\TemporaryWorkerCreatorInterface;
 use Phphleb\WebRotor\Src\Session\SessionManagerInterface;
 use Phphleb\WebRotor\Src\Storage\StorageInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -58,12 +59,18 @@ class Worker
      */
     private $sessionManager;
 
+    /**
+     * @var TemporaryWorkerCreatorInterface
+     */
+    private $workerCreator;
+
     public function __construct(
-        InternalConfig          $config,
-        StorageInterface        $storage,
-        Psr7Converter           $converter,
-        LoggerInterface         $logger,
-        SessionManagerInterface $sessionManager
+        InternalConfig                  $config,
+        StorageInterface                $storage,
+        Psr7Converter                   $converter,
+        LoggerInterface                 $logger,
+        SessionManagerInterface         $sessionManager,
+        TemporaryWorkerCreatorInterface $workerCreator
     )
     {
         $this->config = $config;
@@ -71,6 +78,7 @@ class Worker
         $this->logger = $logger;
         $this->converter = $converter;
         $this->sessionManager = $sessionManager;
+        $this->workerCreator = $workerCreator;
     }
 
     public function getStorage(): StorageInterface
@@ -177,7 +185,8 @@ class Worker
             $this->storage,
             $this->config,
             $this->converter,
-            $this->logger
+            $this->logger,
+            $this->workerCreator
         );
     }
 

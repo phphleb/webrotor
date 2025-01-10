@@ -87,6 +87,21 @@ final class InternalConfig
      */
     private $isWorker;
 
+    /**
+     * @var int
+     */
+    private $temporaryWorkerLifetimeSec;
+
+    /**
+     * @var bool
+     */
+    private $isTemporaryWorker;
+
+    /**
+     * @var string
+     */
+    private $interpreterPathPattern;
+
     public function __construct(
         string $indexFilePath,
         float  $startUnixTime,
@@ -101,7 +116,10 @@ final class InternalConfig
         bool   $debug,
         int    $logRotationPerDay,
         string $timeZone,
-        bool   $isWorker
+        bool   $isWorker,
+        int    $temporaryWorkerLifetimeSec,
+        bool   $isTemporaryWorker,
+        string $interpreterPathPattern
     )
     {
         if ($workerNum < 0) {
@@ -121,6 +139,9 @@ final class InternalConfig
         }
         if ($workerResponseTimeSec < 0) {
             throw new WebRotorConfigException('The worker wait time cannot be a negative number.');
+        }
+        if ($temporaryWorkerLifetimeSec < 0) {
+            throw new WebRotorConfigException('The temporary worker lifetime wait time cannot be a negative number.');
         }
         if ($timeZone === '') {
             $timeZone = date_default_timezone_get();
@@ -157,6 +178,9 @@ final class InternalConfig
         $this->logRotationPerDay = $logRotationPerDay;
         $this->timeZone = $timeZone;
         $this->isWorker = $isWorker;
+        $this->temporaryWorkerLifetimeSec = $temporaryWorkerLifetimeSec;
+        $this->isTemporaryWorker = $isTemporaryWorker;
+        $this->interpreterPathPattern = $interpreterPathPattern;
     }
 
     /**
@@ -307,5 +331,29 @@ final class InternalConfig
     public function isWorker(): bool
     {
         return $this->isWorker;
+    }
+
+    /**
+     * The lifetime of the temporary worker in seconds.
+     */
+    public function getTemporaryWorkerLifetimeSec(): int
+    {
+        return $this->temporaryWorkerLifetimeSec;
+    }
+
+    /**
+     * Indicates the current worker as temporary.
+     */
+    public function isTemporaryWorker(): bool
+    {
+        return $this->isTemporaryWorker;
+    }
+
+    /**
+     * The existing path to the PHP interpreter of the current script.
+     */
+    public function getInterpreterPathPattern(): string
+    {
+        return $this->interpreterPathPattern;
     }
 }

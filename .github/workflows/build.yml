@@ -19,6 +19,7 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
+          - windows-latest
 
         php:
           - "7.2"
@@ -47,11 +48,11 @@ jobs:
       - name: Create new directory for PHP version
         run: mkdir -p "${{ env.TARGET_DIR }}"
 
+      - name: Install webrotor
+        run: cd ${{ env.TARGET_DIR }} && composer require phphleb/webrotor --with-dependencies
+
       - name: Install tests
         run:  cd ${{ env.TARGET_DIR }} && composer require phphleb/webrotor-tests --with-dependencies
-
-      - name: Copy config
-        run: cp -p ${{ env.TARGET_DIR }}/vendor/phphleb/webrotor-tests/phpunit.xml ${{ env.TARGET_DIR }}/phpunit.xml
 
       - name: Composer autoload
         run:  cd ${{ env.TARGET_DIR }} && composer dump-autoload
