@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Phphleb\Webrotor\Src\Middlewares;
+namespace Phphleb\Webrotor\Src\Middleware;
 
 use RuntimeException;
 

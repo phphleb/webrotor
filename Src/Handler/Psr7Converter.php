@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Phphleb\Webrotor\Src\Handler;
 
-use Phphleb\Webrotor\Src\Middlewares\CookieMiddleware;
-use Phphleb\Webrotor\Src\Middlewares\CookieMiddlewareInterface;
-use Phphleb\Webrotor\Src\Middlewares\SessionMiddleware;
-use Phphleb\Webrotor\Src\Middlewares\SessionMiddlewareInterface;
+use Phphleb\Webrotor\Src\Middleware\CookieMiddleware;
+use Phphleb\Webrotor\Src\Middleware\CookieMiddlewareInterface;
+use Phphleb\Webrotor\Src\Middleware\SessionMiddleware;
+use Phphleb\Webrotor\Src\Middleware\SessionMiddlewareInterface;
 use Phphleb\Webrotor\Src\Session\SessionManagerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
