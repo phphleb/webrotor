@@ -57,9 +57,11 @@ or [Guzzle](https://github.com/guzzle/guzzle/):
 ```bash
  composer require guzzlehttp/guzzle
 ````
+
+## Shared Hosting
 ### Modifying the Index File
 
-Typically, dedicated hosting environments have a public folder containing an index file, usually named `index.php`.  
+Typically, shared hosting environments have a public folder containing an index file, usually named `index.php`.  
 It is necessary to modify this file so that your application's code is enclosed within an asynchronous loop.
 You can find examples of how to connect to an asynchronous server in the documentation for the framework you are using.  
 In a simplified manner, this looks like:
@@ -88,7 +90,7 @@ $server->run(function(ServerRequestInterface $request, ResponseInterface $respon
 });
 ```
 
-### Launching Workers
+## Launching Workers
 
 Now for the fun part! :) Shared hosting is unlikely to allow you to daemonize processes, but we will use the built-in cron (or its equivalents).
 First, find the section in your hosting admin panel named something like "Task Scheduler" or "crontab."
@@ -117,7 +119,7 @@ The implementation can vary depending on your hosting settings, but if you encou
 
 Workers can number more than two, and the restart time may vary based on specific load and available server resources.
 
-### Configuration
+## Configuration
 
 In the previous example, we indicated that two workers are running with a two-minute interval between them.
 Now, it’s essential to modify this in the web server settings, as it defaults to one worker restarting every minute.
@@ -138,7 +140,7 @@ $server = new WebRotor($config);
 ```
 By default, web server logs are stored above the public directory in the `wr-logs` folder.
 
-### Working with Sessions, Cookies, and Files in Asynchronous Mode
+## Working with Sessions, Cookies, and Files in Asynchronous Mode
 
 Asynchronous mode has its own specific characteristics since the request is handled by a worker within a single thread inside the standard loop.  
 As a result, additional attributes are passed through a created object that implements the `ServerRequestInterface`.
@@ -173,12 +175,12 @@ $server->run(function(ServerRequestInterface $request, ResponseInterface $respon
 });
 ```
 
-### Virtual Server or Dedicated Server
+## Virtual Server or Dedicated Server
 
 With broader access to the server environment, there's the potential to replace the current worker data storage with a Redis-based storage to maximize performance. An example of such a setup can be found in the `Src/examples` folder.
 
 
-### Local Development
+## Local Development
 
 For local development, there's no need to modify the previous setup. Simply run the following command from the project's public directory:
 
