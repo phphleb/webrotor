@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Phphleb\Webrotor\Src;
 
-use Phphleb\Webrotor\Src\Exceptions\WebRotorConfigException;
-use Phphleb\Webrotor\Src\Exceptions\WebRotorFileSecurityException;
+use Phphleb\Webrotor\Src\Exception\WebRotorConfigException;
+use Phphleb\Webrotor\Src\Exception\WebRotorFileSecurityException;
 use Phphleb\Webrotor\Src\Process\WorkerHelper;
 
 /**

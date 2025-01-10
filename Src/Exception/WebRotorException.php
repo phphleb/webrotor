@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Phphleb\Webrotor\Src\Exceptions;
+namespace Phphleb\Webrotor\Src\Exception;
 
 use Psr\Log\LoggerInterface;
 use RuntimeException;

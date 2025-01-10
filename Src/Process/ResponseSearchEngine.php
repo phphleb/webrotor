@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Phphleb\Webrotor\Src\Process;
 
-use Phphleb\Webrotor\Src\Exceptions\WebRotorException;
+use Phphleb\Webrotor\Src\Exception\WebRotorException;
 use Phphleb\Webrotor\Src\InternalConfig;
 use Phphleb\Webrotor\Src\Storage\StorageInterface;
 
