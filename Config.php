@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Phphleb\WebRotor;
+namespace Phphleb\Webrotor;
 
 use Psr\Log\LogLevel;
 

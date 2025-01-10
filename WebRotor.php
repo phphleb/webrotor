@@ -2,26 +2,26 @@
 
 declare(strict_types=1);
 
-namespace Phphleb\WebRotor;
+namespace Phphleb\Webrotor;
 
-use Phphleb\WebRotor\Src\Exceptions\WebRotorConfigException;
-use Phphleb\WebRotor\Src\Exceptions\WebRotorException;
-use Phphleb\WebRotor\Src\Handler\Psr7Converter;
-use Phphleb\WebRotor\Src\Handler\Psr7CreatorInterface;
-use Phphleb\WebRotor\Src\InternalConfig;
-use Phphleb\WebRotor\Src\Log\FileLogger;
-use Phphleb\WebRotor\Src\Middlewares\CookieMiddlewareInterface;
-use Phphleb\WebRotor\Src\Middlewares\SessionMiddlewareInterface;
-use Phphleb\WebRotor\Src\Process\Cleaner;
-use Phphleb\WebRotor\Src\Process\Output;
-use Phphleb\WebRotor\Src\Process\Spawn\TemporaryWorkerCreator;
-use Phphleb\WebRotor\Src\Process\Spawn\TemporaryWorkerCreatorInterface;
-use Phphleb\WebRotor\Src\Session\SessionManager;
-use Phphleb\WebRotor\Src\Process\Worker;
-use Phphleb\WebRotor\Src\Log\LoggerManager;
-use Phphleb\WebRotor\Src\Session\SessionManagerInterface;
-use Phphleb\WebRotor\Src\Storage\FileStorage;
-use Phphleb\WebRotor\Src\Storage\StorageInterface;
+use Phphleb\Webrotor\Src\Exceptions\WebrotorConfigException;
+use Phphleb\Webrotor\Src\Exceptions\WebrotorException;
+use Phphleb\Webrotor\Src\Handler\Psr7Converter;
+use Phphleb\Webrotor\Src\Handler\Psr7CreatorInterface;
+use Phphleb\Webrotor\Src\InternalConfig;
+use Phphleb\Webrotor\Src\Log\FileLogger;
+use Phphleb\Webrotor\Src\Middlewares\CookieMiddlewareInterface;
+use Phphleb\Webrotor\Src\Middlewares\SessionMiddlewareInterface;
+use Phphleb\Webrotor\Src\Process\Cleaner;
+use Phphleb\Webrotor\Src\Process\Output;
+use Phphleb\Webrotor\Src\Process\Spawn\TemporaryWorkerCreator;
+use Phphleb\Webrotor\Src\Process\Spawn\TemporaryWorkerCreatorInterface;
+use Phphleb\Webrotor\Src\Session\SessionManager;
+use Phphleb\Webrotor\Src\Process\Worker;
+use Phphleb\Webrotor\Src\Log\LoggerManager;
+use Phphleb\Webrotor\Src\Session\SessionManagerInterface;
+use Phphleb\Webrotor\Src\Storage\FileStorage;
+use Phphleb\Webrotor\Src\Storage\StorageInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;

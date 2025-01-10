@@ -71,8 +71,8 @@ In a simplified manner, this looks like:
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Phphleb\WebRotor\WebRotor;
-use Phphleb\WebRotor\Src\Handler\NyholmPsr7Creator;
+use Phphleb\Webrotor\WebRotor;
+use Phphleb\Webrotor\Src\Handler\NyholmPsr7Creator;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -117,7 +117,7 @@ Here's how to do that:
 
 ```php
 // ... //
-use Phphleb\WebRotor\Config;
+use Phphleb\Webrotor\Config;
 
 $config = new Config();
 $config->logLevel = 'warning'; // Logging level according to PSR-3.
