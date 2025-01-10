@@ -26,7 +26,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Phphleb\\Webrotor\\Src\\" : "Src/"
+            "Phphleb\\Webrotor\\Src\\" : "Src/",
+            "Phphleb\\Webrotor\\": ""
         },
         "classmap": [
             "WebRotor.php",

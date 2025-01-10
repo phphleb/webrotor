@@ -5,7 +5,7 @@
 use Phphleb\Webrotor\Src\Handler\NyholmPsr7Creator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Phphleb\WebRotor\WebRotor;
+use Phphleb\Webrotor\WebRotor;
 
 require __DIR__ . '/../vendor/autoload.php';
 
