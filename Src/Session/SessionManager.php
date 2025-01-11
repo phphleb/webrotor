@@ -36,10 +36,20 @@ final class SessionManager implements SessionManagerInterface
     #[\Override]
     public function restart(string $id, string $name): void
     {
-        $defaultId = $this->isActive() ? session_id($id) : '';
-        if ($defaultId !== $id) {
+        if (!$id || !$name) {
+            $this->clean();
+            return;
+        }
+        $defaultId = '';
+        $sessionName = '';
+        if ($this->isActive()) {
+            $defaultId = session_id();
+            $sessionName = session_name();
+        }
+        if ($defaultId !== $id || $sessionName !== $name) {
             $this->clean();
             session_id($id);
+            session_name($name);
             $this->start();
             $this->logger->debug($this->label . 'Restart session.');
         }
