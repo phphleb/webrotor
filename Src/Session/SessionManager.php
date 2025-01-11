@@ -43,8 +43,8 @@ final class SessionManager implements SessionManagerInterface
             $defaultName = session_name($name);
         }
         if ($defaultId !== $id || $defaultName !== $name) {
-            session_destroy();
-            session_id($id);
+            $this->clean();
+            $this->start();
             session_name($name);
             session_start();
             $this->logger->debug($this->label . 'Restart session.');
