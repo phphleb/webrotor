@@ -34,6 +34,9 @@ final class FileLogger extends AbstractLogger
 
     /**
      * @inheritDoc
+     *
+     * @param string $level
+     * @param string $message
      */
     public function log($level, $message, array $context = []): void
     {
