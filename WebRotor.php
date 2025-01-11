@@ -350,7 +350,7 @@ final class WebRotor
                     $interpreterPathPattern = str_replace('{version}', $version, $config->interpreterPathPattern);
                 }
                 if (!is_dir($interpreterPathPattern)) {
-                    $this->logger->error('The path to the interpreter in the configuration is incorrectly specified');
+                    $interpreterPathPattern = '';
                 }
             }
             foreach($arguments ?? [] as $arg) {

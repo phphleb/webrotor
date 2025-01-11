@@ -42,6 +42,9 @@ final class TemporaryWorkerCreator implements TemporaryWorkerCreatorInterface
     public function createWorker(): void
     {
         $interpreter = $this->config->getInterpreterPathPattern();
+        if (!$interpreter || !is_dir($interpreter)) {
+            $this->logger->warning('The path for the PHP interpreter in the configuration is incorrect');
+        }
         $workerId = $this->config->getCurrentWorkerId();
         $newWorkerId = $workerId * 100 + rand(0, 99);
         if ($newWorkerId > 100000) {
