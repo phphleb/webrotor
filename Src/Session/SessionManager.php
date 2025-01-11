@@ -30,11 +30,20 @@ final class SessionManager implements SessionManagerInterface
         $this->label = $config->isWorker() ? '(W) ' : '(S) ';
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     */
     #[\Override]
     public function restart(string $id, string $name): void
     {
-        if ($id && $name && !$this->isActive()) {
+        $defaultId = '';
+        $defaultName = '';
+        if ($this->isActive()) {
+            $defaultId = session_id($id);
+            $defaultName = session_name($name);
+        }
+        if ($defaultId !== $id || $defaultName !== $name) {
+            session_destroy();
             session_id($id);
             session_name($name);
             session_start();
@@ -51,8 +60,12 @@ final class SessionManager implements SessionManagerInterface
     public function start(): array
     {
         if (!$this->isActive()) {
-            session_start();
-            $this->logger->debug($this->label . 'Start a session because it is not active.');
+            try {
+                session_start();
+                $this->logger->debug($this->label . 'Start a session because it is not active.');
+            } catch (\Throwable $e) {
+                $this->logger->debug($this->label . 'Failed to create session: ' . $e);
+            }
         }
         return ['session_id' => session_id(), 'session_name' => session_name()];
     }
@@ -63,7 +76,6 @@ final class SessionManager implements SessionManagerInterface
     public function clean(): void
     {
         if ($this->isActive()) {
-            session_unset();
             session_destroy();
             $this->logger->debug($this->label . 'Destroying an active session.');
         }

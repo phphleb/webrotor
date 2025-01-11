@@ -8,6 +8,7 @@ use Iterator;
 use Phphleb\Webrotor\Src\Handler\Psr7Converter;
 use Phphleb\Webrotor\Src\InternalConfig;
 use Phphleb\Webrotor\Src\Process\Spawn\TemporaryWorkerCreatorInterface;
+use Phphleb\Webrotor\Src\Session\SessionManagerInterface;
 use Phphleb\Webrotor\Src\Storage\StorageInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -66,12 +67,18 @@ class RequestIterator implements Iterator
      */
     private $temporaryWorkerCount = 0;
 
+    /**
+     * @var SessionManagerInterface
+     */
+    private $sessionManager;
+
     public function __construct(
         StorageInterface                $storage,
         InternalConfig                  $config,
         Psr7Converter                   $converter,
         LoggerInterface                 $logger,
-        TemporaryWorkerCreatorInterface $workerCreator
+        TemporaryWorkerCreatorInterface $workerCreator,
+        SessionManagerInterface         $sessionManager
     )
     {
         $this->storage = $storage;
@@ -79,6 +86,7 @@ class RequestIterator implements Iterator
         $this->logger = $logger;
         $this->converter = $converter;
         $this->workerCreator = $workerCreator;
+        $this->sessionManager = $sessionManager;
     }
 
     /**
@@ -204,6 +212,7 @@ class RequestIterator implements Iterator
                  */
                 $array = json_decode((string)$data, true);
                 if ($array) {
+                    $this->sessionManager->clean();
                     $this->request = $this->converter->convertArrayToServerRequest($array);
                 }
             } catch (Throwable $t) {

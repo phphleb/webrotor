@@ -51,6 +51,7 @@ final class FileStorage implements StorageInterface
     #[\Override]
     public function set(string $key, string $type, string $value): void
     {
+        $umask = @umask(0000);
         $dir = $this->directory . DIRECTORY_SEPARATOR . $type;
         if (empty($this->subdirectoryExists[$type]) && !is_dir($dir) && !@mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new WebRotorException(sprintf('Directory "%s" was not created', $dir));
@@ -58,7 +59,10 @@ final class FileStorage implements StorageInterface
         $this->subdirectoryExists[$type] = true;
 
         $file = $dir . DIRECTORY_SEPARATOR . $key . '.json';
-        @file_put_contents($file, $value, LOCK_EX|LOCK_SH);
+        @file_put_contents($file, $value, LOCK_EX);
+        @chmod($file, 0777);
+
+        is_int($umask) and @umask($umask);
     }
 
     /** @inheritDoc */
@@ -95,7 +99,9 @@ final class FileStorage implements StorageInterface
             $this->subdirectoryExists[$type] = true;
         }
 
-        $files = scandir($dir);
+        if (!($files = @scandir($dir))) {
+            return [];
+        };
 
         $jsonFiles = array_filter((array)$files, static function($file) {
             return pathinfo((string)$file, PATHINFO_EXTENSION) === 'json';

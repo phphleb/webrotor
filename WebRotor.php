@@ -232,7 +232,7 @@ final class WebRotor
     {
         $this->hasInitialized = true;
         $storage = $this->storage ?? new FileStorage($this->config->getRuntimeDirectory());
-        $sessionManager = $this->sessionManager ?? new SessionManager($this->logger, $this->config);
+        $this->sessionManager = $this->sessionManager ?? new SessionManager($this->logger, $this->config);
         $workerCreator = $this->workerCreator ?? new TemporaryWorkerCreator($this->config, $this->logger, $storage);
 
         $this->process = new Worker(
@@ -242,10 +242,10 @@ final class WebRotor
                 $psr7Creator,
                 $this->cookie,
                 $this->session,
-                $sessionManager
+                $this->sessionManager
             ),
             $this->logger,
-            $sessionManager,
+            $this->sessionManager,
             $workerCreator
         );
 
@@ -359,7 +359,7 @@ final class WebRotor
                 }
             }
             foreach($arguments ?? [] as $arg) {
-                  if (strpos($arg, self::ID_ARG . '=') === 0) {
+                if (strpos($arg, self::ID_ARG . '=') === 0) {
                     $workerId = (int)substr($arg, strlen(self::ID_ARG) + 1);
                     if ((!$isTemporaryWorker && $workerId > $config->workerNum) || $workerId < 1) {
                         throw new WebRotorConfigException('The ID of the current worker is not included in the number set in the configuration');

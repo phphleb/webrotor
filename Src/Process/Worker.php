@@ -186,7 +186,8 @@ class Worker
             $this->config,
             $this->converter,
             $this->logger,
-            $this->workerCreator
+            $this->workerCreator,
+            $this->sessionManager
         );
     }
 

@@ -87,8 +87,8 @@ final class Psr7Converter
      */
     public function convertCurrentServerRequestToArray(?ServerRequestInterface $request = null): array
     {
-        $sessionInfo = $this->sessionManager->start();
         if (!$request) {
+            $sessionInfo = $this->sessionManager->start();
             $request = $this->psr7Creator->getCurrentRequestFromGlobals()
                 ->withAttribute('sessionId', $sessionInfo['session_id'])
                 ->withAttribute('sessionName', $sessionInfo['session_name'])
@@ -158,7 +158,6 @@ final class Psr7Converter
      */
     public function convertArrayToServerRequest(array $request): ServerRequestInterface
     {
-        $this->sessionManager->clean();
         $_GET = $_POST = $_REQUEST = $_SERVER = $_FILES = [];
         $_SESSION = $_COOKIE = [];
 
