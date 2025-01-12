@@ -39,7 +39,7 @@ final class WorkerHelper
 
         $info = json_decode($json, true);
 
-        if (!is_array($info) || count($info) !== 2) {
+        if (!is_array($info) || count($info) !== 3) {
             throw new WebRotorException('Wrong worker data format');
         }
         return ['start' => (float)$info['start'], 'lifetime' => (int)$info['lifetime'], 'version' => (int)$info['version']];
