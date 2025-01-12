@@ -163,7 +163,7 @@ class RequestIterator implements Iterator
             }
             $time = microtime(true);
             foreach ($unprocessed as $key => $item) {
-                if (WorkerHelper::checkIsOlder($item, Worker::REQUEST_TYPE, $time)) {
+                if (WorkerHelper::checkIsOlder($item, Worker::REQUEST_TYPE, $time, $this->config->getCodeVersion())) {
                     unset($unprocessed[$key]);
                 }
             }

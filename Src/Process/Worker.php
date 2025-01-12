@@ -114,7 +114,7 @@ class Worker
             $id = $this->getDistributionId();
         }
 
-        $tag = $this->createTag($id);
+        $tag = $this->createTag($id, $this->config->getCodeVersion());
 
         try {
             $data = $this->converter->convertCurrentServerRequestToArray();
@@ -134,17 +134,16 @@ class Worker
     /**
      * Creates a suitable tag to store requests and responses.
      */
-    public function createTag(int $workerId): string
+    public function createTag(int $workerId, int $codeVersion): string
     {
         $executionTime = $this->config->getMaxExecutionTime();
-        $max = 1000000;
         while (true) {
             $id = uniqid('', false);
-            $tag = $workerId . '-' . ((int)(microtime(true) * 1000000)) . '-' . $executionTime . '-' . $id;
+            $time = ((int)(microtime(true) * 1000000));
+            $tag = $workerId . '-' . $time . '-' . $executionTime . '-' . $codeVersion . '-' . $id ;
             if (!$this->storage->has($tag, self::REQUEST_TYPE)) {
                 break;
             }
-            $max *= 10;
         }
 
         return $tag;

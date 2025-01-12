@@ -390,7 +390,8 @@ final class WebRotor
             $this->isWorker,
             $config->temporaryWorkerLifetimeSec,
             $isTemporaryWorker,
-            $interpreterPathPattern
+            $interpreterPathPattern,
+            $config->codeVersion
         );
     }
 }

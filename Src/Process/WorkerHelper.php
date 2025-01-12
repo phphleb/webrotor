@@ -48,12 +48,16 @@ final class WorkerHelper
     /**
      * Checking if a resource is out of date.
      */
-    public static function checkIsOlder(string $key, string $type, float $startTime): bool
+    public static function checkIsOlder(string $key, string $type, float $startTime, ?int $codeVersion = null): bool
     {
         if ($type === Worker::WORKER_TYPE) {
             return false;
         }
-        [$_id, $time, $executionTime, $_file] = explode('-', $key);
+        [$_id, $time, $executionTime, $version, $_file] = explode('-', $key);
+
+        if ($codeVersion !== null && (int)$version !== $codeVersion) {
+            return true;
+        }
 
         $time = (float)(((int)$time)/1000000);
 

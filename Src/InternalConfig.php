@@ -102,6 +102,11 @@ final class InternalConfig
      */
     private $interpreterPathPattern;
 
+    /**
+     * @var int
+     */
+    private $codeVersion;
+
     public function __construct(
         string $indexFilePath,
         float  $startUnixTime,
@@ -119,7 +124,8 @@ final class InternalConfig
         bool   $isWorker,
         int    $temporaryWorkerLifetimeSec,
         bool   $isTemporaryWorker,
-        string $interpreterPathPattern
+        string $interpreterPathPattern,
+        int    $codeVersion
     )
     {
         if ($workerNum < 0) {
@@ -181,6 +187,7 @@ final class InternalConfig
         $this->temporaryWorkerLifetimeSec = $temporaryWorkerLifetimeSec;
         $this->isTemporaryWorker = $isTemporaryWorker;
         $this->interpreterPathPattern = $interpreterPathPattern;
+        $this->codeVersion = $codeVersion;
     }
 
     /**
@@ -355,5 +362,13 @@ final class InternalConfig
     public function getInterpreterPathPattern(): string
     {
         return $this->interpreterPathPattern;
+    }
+
+    /**
+     * Code version for request and worker compatibility.
+     */
+    public function getCodeVersion(): int
+    {
+        return $this->codeVersion;
     }
 }

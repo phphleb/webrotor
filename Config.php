@@ -122,4 +122,12 @@ final class Config
      * @var string
      */
     public $interpreterPathPattern = '/usr/local/bin/php{version}';
+
+    /**
+     * When sending new code to the server, simply increment this value
+     * by one and the old running workers will not process the new code.
+     *
+     * @var int
+     */
+    public $codeVersion = 1;
 }
