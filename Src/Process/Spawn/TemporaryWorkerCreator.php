@@ -44,6 +44,7 @@ final class TemporaryWorkerCreator implements TemporaryWorkerCreatorInterface
         $interpreter = $this->config->getInterpreterPathPattern();
         if (!$interpreter || !is_dir($interpreter)) {
             $this->logger->warning('The path for the PHP interpreter in the configuration is incorrect');
+            return;
         }
         $workerId = $this->config->getCurrentWorkerId();
         $newWorkerId = $workerId * 100 + rand(0, 99);
@@ -75,7 +76,8 @@ final class TemporaryWorkerCreator implements TemporaryWorkerCreatorInterface
                     if ($this->storage->get((string)$newWorkerId, Worker::WORKER_TYPE)) {
                         $this->logger->info("(W) Failed to create worker #{id}", ['id' => $newWorkerId]);
                     }
-                } catch (Throwable $_t) {
+                } catch (Throwable $t) {
+                    $this->logger->warning('The additional worker failed to start. ' . $t->getMessage());
                 }
                 break;
             }
