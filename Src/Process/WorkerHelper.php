@@ -42,7 +42,7 @@ final class WorkerHelper
         if (!is_array($info) || count($info) !== 2) {
             throw new WebRotorException('Wrong worker data format');
         }
-        return ['start' => (float)$info['start'], 'lifetime' => (int)$info['lifetime']];
+        return ['start' => (float)$info['start'], 'lifetime' => (int)$info['lifetime'], 'version' => (int)$info['version']];
     }
 
     /**

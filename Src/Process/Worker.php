@@ -170,7 +170,8 @@ class Worker
             self::WORKER_TYPE,
             (string)json_encode([
                 'start' => $this->config->getStartUnixTime(),
-                'lifetime' => $this->config->getWorkerLifetimeSec()
+                'lifetime' => $this->config->getWorkerLifetimeSec(),
+                'version' => $this->config->getCodeVersion()
             ])
         );
     }
@@ -371,6 +372,9 @@ class Worker
      */
     private function checkWorkerIsAccessible(array $workerInfo): bool
     {
+        if ($workerInfo['version'] !== $this->config->getCodeVersion()) {
+            return false;
+        }
         // If the worker started a long time ago, then it is not suitable for selection.
         return (($workerInfo['start'] + (float)$workerInfo['lifetime']) > ($this->config->getStartUnixTime() - 1));
     }
