@@ -149,6 +149,9 @@ final class InternalConfig
         if ($temporaryWorkerLifetimeSec < 0) {
             throw new WebRotorConfigException('The temporary worker lifetime wait time cannot be a negative number.');
         }
+        if ($codeVersion < 0) {
+            throw new WebRotorConfigException('The specified application code version cannot be less than zero.');
+        }
         if ($timeZone === '') {
             $timeZone = date_default_timezone_get();
         }
