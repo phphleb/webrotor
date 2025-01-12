@@ -37,7 +37,6 @@ final class SessionManager implements SessionManagerInterface
     public function restart(string $id, string $name): void
     {
         if (!$id || !$name) {
-            $this->clean();
             return;
         }
         $defaultId = '';
@@ -45,6 +44,9 @@ final class SessionManager implements SessionManagerInterface
         if ($this->isActive()) {
             $defaultId = session_id();
             $sessionName = session_name();
+        }
+        if (!$defaultId || !$sessionName) {
+            return;
         }
         if ($defaultId !== $id || $sessionName !== $name) {
             $this->clean();
@@ -63,15 +65,14 @@ final class SessionManager implements SessionManagerInterface
     #[\Override]
     public function start(): array
     {
-        if (!$this->isActive()) {
-            try {
-                session_start();
-                $this->logger->debug($this->label . 'Start a session because it is not active.');
-            } catch (\Throwable $e) {
-                $this->logger->debug($this->label . 'Failed to create session: ' . $e);
-            }
-        }
-        return ['session_id' => session_id(), 'session_name' => session_name()];
+        $sessionId = @session_id();
+        $sessionName = @session_name();
+        // If you need to start a session, then you need to do this separately.
+        $this->logger->debug(
+            $this->label . 'Session data at the start of processing: {session_id:{id} session_name:{name}, active:{active}}',
+            ['id' => $sessionId, 'name' => $sessionName, 'active' => (int)$this->isActive()]);
+
+        return ['session_id' => $sessionId, 'session_name' => $sessionName];
     }
 
 
@@ -80,8 +81,8 @@ final class SessionManager implements SessionManagerInterface
     public function clean(): void
     {
         if ($this->isActive()) {
-            session_destroy();
-            $this->logger->debug($this->label . 'Destroying an active session.');
+            // This function is used to close the current session.
+            @session_write_close();
         }
     }
 

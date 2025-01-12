@@ -60,7 +60,6 @@ final class FileStorage implements StorageInterface
 
         $file = $dir . DIRECTORY_SEPARATOR . $key . '.json';
         @file_put_contents($file, $value, LOCK_EX);
-        @chmod($file, 0777);
 
         is_int($umask) and @umask($umask);
     }

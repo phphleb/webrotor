@@ -255,6 +255,10 @@ final class Psr7Converter
         return [
             'statusCode' => $response->getStatusCode(),
             'reasonPhrase' => $response->getReasonPhrase(),
+            'request' => [
+                'method' => $request->getMethod(),
+                'uri' => (string)$request->getUri(),
+            ],
             'headers' => $response->getHeaders(),
             'body' => (string)$response->getBody(),
             'version' => $response->getProtocolVersion(),
