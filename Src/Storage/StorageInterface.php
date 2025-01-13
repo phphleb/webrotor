@@ -33,9 +33,9 @@ interface StorageInterface
      *
      * @param string $key - a unique key that will be used to perform the deletion.
      * @param string $type - points to a partition, table or directory.
-     * @return void
+     * @return bool - the result of the deletion.
      */
-    public function delete(string $key, string $type): void;
+    public function delete(string $key, string $type): bool;
 
     /**
      * Checking the existence of a key.

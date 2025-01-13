@@ -27,6 +27,13 @@ class RequestIterator implements Iterator
 
     protected const PAUSE = 1000;
 
+    protected const PROCESS_RACE_DELAY = 10;
+
+    /**
+     * @var bool
+     */
+    private $isRaceActive = false;
+
     /**
      * @var string
      */
@@ -158,7 +165,7 @@ class RequestIterator implements Iterator
             $unprocessed = array_diff($requestKeys, $responseKeys);
 
             if (!$unprocessed) {
-                usleep(self::PAUSE);
+                usleep($this->isRaceActive ? self::PROCESS_RACE_DELAY : self::PAUSE);
                 continue;
             }
             $time = microtime(true);
@@ -168,7 +175,7 @@ class RequestIterator implements Iterator
                 }
             }
             if (!$unprocessed) {
-                usleep(self::PAUSE);
+                usleep($this->isRaceActive ? self::PROCESS_RACE_DELAY : self::PAUSE);
                 continue;
             }
             // Processing starts with the oldest requests.
@@ -180,13 +187,22 @@ class RequestIterator implements Iterator
 
             $data = $this->storage->get($tag, Worker::REQUEST_TYPE);
             $this->logger->debug('The {tag} tag has been received for processing and is being removed from the storage.', ['tag' => $tag]);
-            $this->storage->delete($tag, Worker::REQUEST_TYPE);
+            if (!$this->storage->delete($tag, Worker::REQUEST_TYPE)) {
+                $this->isRaceActive = true;
+                // Was taken away by a competing process.
+                continue;
+            }
             $responseTag = $responseKeys[$tag] ?? null;
             if ($responseTag && !$this->config->isDebug()) {
-                $this->storage->delete($responseTag, Worker::RESPONSE_TYPE);
+                if (!$this->storage->delete($responseTag, Worker::RESPONSE_TYPE)) {
+                    $this->isRaceActive = true;
+                    // Was taken away by a competing process.
+                    continue;
+                }
             }
             if (!$data) {
-                $this->logger->error('Failed to receive request data by worker for ' . $tag);
+                $this->logger->warning('Failed to receive request data by worker for ' . $tag);
+                continue;
             }
             $array = [];
             try {
@@ -219,8 +235,7 @@ class RequestIterator implements Iterator
                 $this->logger->error("(A) Failed to convert data to response object for {tag}. " . $t, ['tag' => $tag]);
             }
             if (!$array) {
-                $this->logger->error('(W) The found request {tag} could not be converted.', ['tag' => $tag]);
-                usleep(self::PAUSE);
+                $this->logger->warning('(W) The found request {tag} could not be converted.', ['tag' => $tag]);
                 continue;
             }
             $this->logger->debug("Request {tag} received successfully.", ['tag' => $tag]);

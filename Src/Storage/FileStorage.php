@@ -6,7 +6,7 @@ namespace Phphleb\Webrotor\Src\Storage;
 
 use Phphleb\Webrotor\Src\Exception\WebRotorException;
 use Phphleb\Webrotor\Src\Exception\WebRotorInvalidArgumentException;
-use Throwable;
+use RuntimeException;
 
 /**
  * @author Foma Tuturov <fomiash@yandex.ru>
@@ -36,13 +36,18 @@ final class FileStorage implements StorageInterface
     public function get(string $key, string $type): ?string
     {
         $file = $this->directory . DIRECTORY_SEPARATOR . $type . DIRECTORY_SEPARATOR . $key . '.json';
-        if (!file_exists($file)) {
-            return null;
-        }
+        $content = null;
         try {
-            $content = @file_get_contents($file);
-        } catch (Throwable $_t) {
-            return null;
+            set_error_handler(static function ($_errno, $errstr) {
+                throw new RuntimeException($errstr);
+            });
+
+            $content = file_get_contents($file);
+
+        } catch (RuntimeException $_e) {
+
+        } finally {
+            restore_error_handler();
         }
         return $content ?: null;
     }
@@ -53,8 +58,17 @@ final class FileStorage implements StorageInterface
     {
         $umask = @umask(0000);
         $dir = $this->directory . DIRECTORY_SEPARATOR . $type;
-        if (empty($this->subdirectoryExists[$type]) && !is_dir($dir) && !@mkdir($dir, 0777, true) && !is_dir($dir)) {
-            throw new WebRotorException(sprintf('Directory "%s" was not created', $dir));
+        try {
+            set_error_handler(static function ($_errno, $errstr) {
+                throw new RuntimeException($errstr);
+            });
+            if (empty($this->subdirectoryExists[$type]) && !is_dir($dir) && !@mkdir($dir, 0777, true) && !is_dir($dir)) {
+                throw new WebRotorException(sprintf('Directory "%s" was not created', $dir));
+            }
+        } catch (RuntimeException $_e) {
+            // Created by a parallel process.
+        } finally {
+            restore_error_handler();
         }
         $this->subdirectoryExists[$type] = true;
 
@@ -66,17 +80,23 @@ final class FileStorage implements StorageInterface
 
     /** @inheritDoc */
     #[\Override]
-    public function delete(string $key, string $type): void
+    public function delete(string $key, string $type): bool
     {
         $file = $this->directory . DIRECTORY_SEPARATOR . $type . DIRECTORY_SEPARATOR . $key . '.json';
-        if (!file_exists($file)) {
-            return;
-        }
         try {
-           @unlink($file);
-        } catch (Throwable $_t) {
+            set_error_handler(static function ($_errno, $errstr) {
+                throw new RuntimeException($errstr);
+            });
+
+            unlink($file);
+
+        } catch (RuntimeException $_e) {
             // Has already been deleted.
+            return false;
+        } finally {
+            restore_error_handler();
         }
+        return true;
     }
 
     /** @inheritDoc */
@@ -100,13 +120,13 @@ final class FileStorage implements StorageInterface
 
         if (!($files = @scandir($dir))) {
             return [];
-        };
+        }
 
-        $jsonFiles = array_filter((array)$files, static function($file) {
+        $jsonFiles = array_filter((array)$files, static function ($file) {
             return pathinfo((string)$file, PATHINFO_EXTENSION) === 'json';
         });
 
-        return array_map(static function($file) {
+        return array_map(static function ($file) {
             return pathinfo((string)$file, PATHINFO_FILENAME);
         }, $jsonFiles);
     }

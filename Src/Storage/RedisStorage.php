@@ -57,11 +57,15 @@ final class RedisStorage implements StorageInterface
      *
      * @throws RedisException
      */
-    public function delete(string $key, string $type): void
+    public function delete(string $key, string $type): bool
     {
         $namespacedKey = $this->buildKey($key, $type);
 
-        $this->redis->del($namespacedKey);
+        $result = $this->redis->del($namespacedKey);
+        if ($result === false) {
+            return false;
+        }
+        return $result > 0;
     }
 
     /**

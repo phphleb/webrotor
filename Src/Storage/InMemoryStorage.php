@@ -30,9 +30,11 @@ final class InMemoryStorage implements StorageInterface
 
     /** @inheritDoc */
     #[\Override]
-    public function delete(string $key, string $type): void
+    public function delete(string $key, string $type): bool
     {
         unset(self::$data[$type][$key]);
+
+        return true;
     }
 
     /** @inheritDoc */
