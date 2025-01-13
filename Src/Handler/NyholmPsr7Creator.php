@@ -10,7 +10,7 @@ use Nyholm\Psr7Server\ServerRequestCreator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class NyholmPsr7Creator implements Psr7CreatorInterface
+final class NyholmPsr7Creator implements Psr7CreatorInterface
 {
     /**
      * @var ServerRequestCreator

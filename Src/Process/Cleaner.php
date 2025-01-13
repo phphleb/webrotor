@@ -11,7 +11,7 @@ use Throwable;
 /**
  * @author Foma Tuturov <fomiash@yandex.ru>
  */
-class Cleaner
+final class Cleaner
 {
     /**
      * @var Worker

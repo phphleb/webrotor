@@ -9,7 +9,7 @@ use GuzzleHttp\Psr7\ServerRequest;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class GuzzlePsr7Creator implements Psr7CreatorInterface
+final class GuzzlePsr7Creator implements Psr7CreatorInterface
 {
     /**
      * @inheritDoc

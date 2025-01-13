@@ -11,7 +11,7 @@ use Phphleb\Webrotor\Src\Storage\StorageInterface;
 /**
  * @author Foma Tuturov <fomiash@yandex.ru>
  */
-class ResponseSearchEngine
+final class ResponseSearchEngine
 {
     protected const PAUSE = 1000;
 

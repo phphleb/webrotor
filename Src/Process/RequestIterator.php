@@ -21,7 +21,7 @@ use Throwable;
  *
  * @implements Iterator<string, ServerRequestInterface>
  */
-class RequestIterator implements Iterator
+final class RequestIterator implements Iterator
 {
     public const MAX_REQUESTS_TO_START_WORKER = 3;
 

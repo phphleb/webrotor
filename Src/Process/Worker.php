@@ -21,7 +21,7 @@ use Throwable;
  *
  * @internal
  */
-class Worker
+final class Worker
 {
     public const REQUEST_TYPE = 'request';
 
