@@ -65,6 +65,9 @@ final class RedisStorage implements StorageInterface
         if ($result === false) {
             return false;
         }
+        if ($result instanceof \Redis) {
+            throw new RedisException("Unexpected Redis instance returned");
+        }
         return $result > 0;
     }
 
