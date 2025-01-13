@@ -178,9 +178,15 @@ class RequestIterator implements Iterator
                 usleep($this->isRaceActive ? self::PROCESS_RACE_DELAY : self::PAUSE);
                 continue;
             }
+
             // Processing starts with the oldest requests.
             sort($unprocessed);
-            $tag = current($unprocessed);
+            if (count($unprocessed) > 2) {
+                $oldestTwo = array_slice($unprocessed, 0, 2);
+                $tag = $oldestTwo[array_rand($oldestTwo)];
+            } else {
+                $tag = current($unprocessed);
+            }
             $this->tag = $tag;
 
             $this->logger->debug("Request {tag} for worker detected.", ['tag' => $tag]);
