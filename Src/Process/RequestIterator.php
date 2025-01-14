@@ -26,11 +26,6 @@ final class RequestIterator implements Iterator
     public const MAX_REQUESTS_TO_START_WORKER = 3;
 
     /**
-     * @var bool
-     */
-    private $isRaceActive = false;
-
-    /**
      * @var string
      */
     private $tag = '';
