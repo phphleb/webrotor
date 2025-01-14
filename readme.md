@@ -179,7 +179,7 @@ $server->run(function(ServerRequestInterface $request, ResponseInterface $respon
 
 ## Example for Laravel 11.x
 
-An example of basic initialization for Laravel 11.x can be found in this repository in the `examples/frameworks` folder.
+An example of basic initialization for `Laravel` 11.x can be found in this repository in the `examples/frameworks` folder.
 
 ## Virtual Server or Dedicated Server
 
