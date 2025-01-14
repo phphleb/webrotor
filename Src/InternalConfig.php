@@ -107,6 +107,16 @@ final class InternalConfig
      */
     private $codeVersion;
 
+    /**
+     * @var int
+     */
+    private $workerRequestDelayMicroSec;
+
+    /**
+     * @var int
+     */
+    private $responseDelayWaitMicroSec;
+
     public function __construct(
         string $indexFilePath,
         float  $startUnixTime,
@@ -125,7 +135,9 @@ final class InternalConfig
         int    $temporaryWorkerLifetimeSec,
         bool   $isTemporaryWorker,
         string $interpreterPathPattern,
-        int    $codeVersion
+        int    $codeVersion,
+        int    $workerRequestDelayMicroSec,
+        int    $responseDelayWaitMicroSec
     )
     {
         if ($workerNum < 0) {
@@ -141,16 +153,22 @@ final class InternalConfig
             throw new WebRotorConfigException('Logging directory not specified');
         }
         if ($logRotationPerDay < 0) {
-            throw new WebRotorConfigException('The log rotation value cannot be a negative number.');
+            throw new WebRotorConfigException('The log rotation value cannot be a negative number');
         }
         if ($workerResponseTimeSec < 0) {
-            throw new WebRotorConfigException('The worker wait time cannot be a negative number.');
+            throw new WebRotorConfigException('The worker wait time cannot be a negative number');
         }
         if ($temporaryWorkerLifetimeSec < 0) {
-            throw new WebRotorConfigException('The temporary worker lifetime wait time cannot be a negative number.');
+            throw new WebRotorConfigException('The temporary worker lifetime wait time cannot be a negative number');
         }
         if ($codeVersion < 0) {
-            throw new WebRotorConfigException('The specified application code version cannot be less than zero.');
+            throw new WebRotorConfigException('The specified application code version cannot be less than zero');
+        }
+        if ($workerRequestDelayMicroSec < 0) {
+            throw new WebRotorConfigException('The worker delay value should not be less than zero');
+        }
+        if ($responseDelayWaitMicroSec < 0) {
+            throw new WebRotorConfigException('The process delay value should not be less than zero');
         }
         if ($timeZone === '') {
             $timeZone = date_default_timezone_get();
@@ -191,6 +209,8 @@ final class InternalConfig
         $this->isTemporaryWorker = $isTemporaryWorker;
         $this->interpreterPathPattern = $interpreterPathPattern;
         $this->codeVersion = $codeVersion;
+        $this->workerRequestDelayMicroSec = $workerRequestDelayMicroSec;
+        $this->responseDelayWaitMicroSec = $responseDelayWaitMicroSec;
     }
 
     /**
@@ -373,5 +393,21 @@ final class InternalConfig
     public function getCodeVersion(): int
     {
         return $this->codeVersion;
+    }
+
+    /**
+     * The delay for the worker while waiting for requests in microseconds.
+     */
+    public function getWorkerRequestDelayMicroSec(): int
+    {
+        return $this->workerRequestDelayMicroSec;
+    }
+
+    /**
+     * The delay for the process while waiting for response in microseconds.
+     */
+    public function getResponseDelayWaitMicroSec(): int
+    {
+        return $this->responseDelayWaitMicroSec;
     }
 }

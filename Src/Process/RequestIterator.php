@@ -25,10 +25,6 @@ final class RequestIterator implements Iterator
 {
     public const MAX_REQUESTS_TO_START_WORKER = 3;
 
-    protected const PAUSE = 1000;
-
-    protected const PROCESS_RACE_DELAY = 10;
-
     /**
      * @var bool
      */
@@ -145,6 +141,7 @@ final class RequestIterator implements Iterator
         $start = $this->config->getStartUnixTime();
         $max = $this->config->getWorkerLifetimeSec();
         $tempMax = $this->config->getTemporaryWorkerLifetimeSec() ?: $max;
+        $delay = $this->config->getWorkerRequestDelayMicroSec();
 
         while (true) {
             $requestKeys = $this->storage->keys(Worker::REQUEST_TYPE);
@@ -165,7 +162,7 @@ final class RequestIterator implements Iterator
             $unprocessed = array_diff($requestKeys, $responseKeys);
 
             if (!$unprocessed) {
-                usleep($this->isRaceActive ? self::PROCESS_RACE_DELAY : self::PAUSE);
+                $delay and usleep($delay);
                 continue;
             }
             $time = microtime(true);
@@ -175,18 +172,13 @@ final class RequestIterator implements Iterator
                 }
             }
             if (!$unprocessed) {
-                usleep($this->isRaceActive ? self::PROCESS_RACE_DELAY : self::PAUSE);
+                $delay and usleep($delay);
                 continue;
             }
 
             // Processing starts with the oldest requests.
             sort($unprocessed);
-            if (count($unprocessed) > 2) {
-                $oldestTwo = array_slice($unprocessed, 0, 2);
-                $tag = $oldestTwo[array_rand($oldestTwo)];
-            } else {
-                $tag = current($unprocessed);
-            }
+            $tag = current($unprocessed);
             $this->tag = $tag;
 
             $this->logger->debug("Request {tag} for worker detected.", ['tag' => $tag]);

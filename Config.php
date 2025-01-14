@@ -113,6 +113,26 @@ final class Config
     public $temporaryWorkerLifetimeSec = 60;
 
     /**
+     * The delay for the worker while waiting for requests in microseconds.
+     * The delay until the next search for unprocessed requests by the worker
+     * if they were missing depends on this value.
+     * If 0 is specified, the worker will not pause while waiting.
+     *
+     * @var int
+     */
+    public $workerRequestDelayMicroSec = 1000;
+
+
+    /**
+     * The delay for the process while waiting for response in microseconds.
+     * This value determines the interval at which the worker’s response will be checked.
+     * If 0 is specified, the process will not pause while waiting.
+     *
+     * @var int
+     */
+    public $responseDelayWaitMicroSec = 10;
+
+    /**
      * To create temporary workers, you need to run them with the correct interpreter.
      * This path will be searched and {version}
      * will be replaced with the current version.

@@ -391,7 +391,9 @@ final class WebRotor
             $config->temporaryWorkerLifetimeSec,
             $isTemporaryWorker,
             $interpreterPathPattern,
-            $config->codeVersion
+            $config->codeVersion,
+            $config->workerRequestDelayMicroSec,
+            $config->responseDelayWaitMicroSec
         );
     }
 }

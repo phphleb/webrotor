@@ -13,8 +13,6 @@ use Phphleb\Webrotor\Src\Storage\StorageInterface;
  */
 final class ResponseSearchEngine
 {
-    protected const PAUSE = 1000;
-
     /**
      * @var string
      */
@@ -74,6 +72,7 @@ final class ResponseSearchEngine
         $start = $this->config->getStartUnixTime();
         $max = $this->config->getWorkerResponseTimeSec();
         $tag = $this->tag;
+        $delay = $this->config->getResponseDelayWaitMicroSec();
 
         while (true) {
             if (!$max) {
@@ -87,7 +86,7 @@ final class ResponseSearchEngine
             }
             $response = $this->storage->get($tag, Worker::RESPONSE_TYPE);
             if ($response === null) {
-                usleep(self::PAUSE);
+                $delay and usleep($delay);
                 continue;
             }
             if (!$response) {

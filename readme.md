@@ -28,7 +28,9 @@ However, those limitations shouldn't stop you from experimenting with multi-thre
 **WebRotor** is a specialized web server designed for asynchronous request handling on shared hosting. It is easy to install and configure.  
 *Important:* Before using, make sure to review the requirements for your code to execute asynchronously. Most frameworks include guidelines and recommendations for enabling asynchronous functionality.
 
-With this library, applications built on frameworks like `Laravel`, `Symfony`, `Yii3`, `Slim`, and others that support asynchronous processing, along with any other asynchronously written code, can operate in this mode on various shared hosting platforms.
+With this library, applications built on frameworks like `Laravel`, `Symfony`, `Yii3` and others that support asynchronous processing, along with any other asynchronously written code, can operate in this mode on various shared hosting platforms.
+
+_It makes sense to move a project to asynchrony if it has performance problems or you want to experiment with asynchrony._
 
 ---
 
