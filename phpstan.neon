@@ -1,6 +1,6 @@
- parameters:
-       level: max
-       paths:
-           - .
-       excludePaths:
-           - examples/frameworks
+parameters:
+      level: max
+      paths:
+          - .
+      excludePaths:
+          - examples/frameworks
