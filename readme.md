@@ -177,9 +177,13 @@ $server->run(function(ServerRequestInterface $request, ResponseInterface $respon
 });
 ```
 
+## Example for Laravel 11.x
+
+An example of basic initialization for Laravel 11.x can be found in this repository in the `examples/frameworks` folder.
+
 ## Virtual Server or Dedicated Server
 
-With broader access to the server environment, there's the potential to replace the current worker data storage with a Redis-based storage to maximize performance. An example of such a setup can be found in the `Src/examples` folder.
+With broader access to the server environment, there's the potential to replace the current worker data storage with a Redis-based storage to maximize performance. An example of such a setup can be found in the `examples` folder.
 
 
 ## Local Development

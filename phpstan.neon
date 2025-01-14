@@ -2,3 +2,5 @@
        level: max
        paths:
            - .
+       excludePaths:
+           - examples/frameworks
