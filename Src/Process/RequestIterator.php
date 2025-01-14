@@ -181,14 +181,12 @@ final class RequestIterator implements Iterator
             $data = $this->storage->get($tag, Worker::REQUEST_TYPE);
             $this->logger->debug('The {tag} tag has been received for processing and is being removed from the storage.', ['tag' => $tag]);
             if (!$this->storage->delete($tag, Worker::REQUEST_TYPE)) {
-                $this->isRaceActive = true;
                 // Was taken away by a competing process.
                 continue;
             }
             $responseTag = $responseKeys[$tag] ?? null;
             if ($responseTag && !$this->config->isDebug()) {
                 if (!$this->storage->delete($responseTag, Worker::RESPONSE_TYPE)) {
-                    $this->isRaceActive = true;
                     // Was taken away by a competing process.
                     continue;
                 }
