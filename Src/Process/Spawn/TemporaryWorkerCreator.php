@@ -11,6 +11,9 @@ use Phphleb\Webrotor\WebRotor;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
+/**
+ * @author Foma Tuturov <fomiash@yandex.ru>
+ */
 final class TemporaryWorkerCreator implements TemporaryWorkerCreatorInterface
 {
     private const EXEC_FUNCTIONS = ['exec', 'shell_exec'];
