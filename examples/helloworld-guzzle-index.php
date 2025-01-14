@@ -13,6 +13,8 @@ require __DIR__ . '/../vendor/autoload.php';
 // Wrapper for PSR-7 HTTP client.
 $psr7Creator = new GuzzlePsr7Creator();
 $server = new WebRotor();
+
+// Web server initialization should come before the rest of the development code.
 $server->init($psr7Creator);
 
 // Asynchronous cycle of processing code of the framework/application.

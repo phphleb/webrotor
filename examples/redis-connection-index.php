@@ -22,6 +22,8 @@ $storage = new RedisStorage($redis);
 
 $psr7Creator = new NyholmPsr7Creator();
 $server = (new WebRotor())->setStorage($storage);
+
+// Web server initialization should come before the rest of the development code.
 $server->init($psr7Creator);
 
 $server->run(function(ServerRequestInterface $request, ResponseInterface $response) {
