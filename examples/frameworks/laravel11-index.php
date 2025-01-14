@@ -25,7 +25,6 @@ $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 
 // An asynchronous loop for processing requests by the framework.
 $server->run(function (ServerRequestInterface $request, ResponseInterface $response) use ($kernel) {
-    $_SERVER['X-TIME'] = microtime(true);
     $laravelRequest = Request::create(
         (string)$request->getUri(),
         $request->getMethod(),
