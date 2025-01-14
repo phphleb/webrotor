@@ -24,10 +24,16 @@ final class SessionManager implements SessionManagerInterface
      */
     private $label;
 
+    /**
+     * @var InternalConfig
+     */
+    private $config;
+
     public function __construct(LoggerInterface $logger, InternalConfig $config)
     {
         $this->logger = $logger;
         $this->label = $config->isWorker() ? '(W) ' : '(S) ';
+        $this->config = $config;
     }
 
     /**
@@ -65,7 +71,7 @@ final class SessionManager implements SessionManagerInterface
     #[\Override]
     public function start(): array
     {
-        $sessionId = @session_id();
+        $sessionId = $this->config->isDebug() ? @session_id() : '=hidden=';
         $sessionName = @session_name();
         // If you need to start a session, then you need to do this separately.
         $this->logger->debug(
