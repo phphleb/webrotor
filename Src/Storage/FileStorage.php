@@ -74,6 +74,7 @@ final class FileStorage implements StorageInterface
 
         $file = $dir . DIRECTORY_SEPARATOR . $key . '.json';
         @file_put_contents($file, $value, LOCK_EX);
+        clearstatcache(true, $file);
 
         is_int($umask) and @umask($umask);
     }
@@ -95,6 +96,7 @@ final class FileStorage implements StorageInterface
             return false;
         } finally {
             restore_error_handler();
+            clearstatcache(true, $file);
         }
         return true;
     }
