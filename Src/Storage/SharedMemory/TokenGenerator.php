@@ -13,6 +13,6 @@ final class TokenGenerator
   {
       $input = $prefix . '~' . $key . '~' . $type;
 
-      return (int)hexdec(substr(md5($input), 0, 15));
+      return (int)hexdec(substr(md5($input), 0, 8));
   }
 }
