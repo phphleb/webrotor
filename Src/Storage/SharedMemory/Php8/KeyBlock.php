@@ -14,9 +14,9 @@ use Phphleb\Webrotor\Src\Storage\SharedMemory\TokenGenerator;
  */
 final class KeyBlock
 {
-    private const SIZE = 256;
+    private const SIZE = 10485760; // 10 MB
 
-    private const SEG = 0;
+    private const SEGMENT = 0;
 
     /**
      * @var int
@@ -35,7 +35,7 @@ final class KeyBlock
     {
         $id = $this->open();
         /** @var array<string>|null $keysArray */
-        $keysArray = shm_get_var($id, self::SEG);
+        $keysArray = shm_get_var($id, self::SEGMENT);
         $this->close($id);
 
         return $keysArray ?? [];
@@ -44,7 +44,7 @@ final class KeyBlock
     public function has(string $key): bool
     {
         $id = $this->open();
-        $keysArray = shm_get_var($id, self::SEG);
+        $keysArray = shm_get_var($id, self::SEGMENT);
         $this->close($id);
 
         return is_array($keysArray) && in_array($key, $keysArray, true);
@@ -53,7 +53,7 @@ final class KeyBlock
     public function set(string $key): void
     {
         $id = $this->open();
-        $keysArray = shm_get_var($id, self::SEG);
+        $keysArray = shm_get_var($id, self::SEGMENT);
 
         if (!is_array($keysArray)) {
             $keysArray = [];
@@ -62,39 +62,30 @@ final class KeyBlock
         if (!in_array($key, $keysArray, true)) {
             $keysArray[] = $key;
         }
-
-        $size = count($keysArray) * 100;
-
-        if ($size >= self::SIZE) {
-            shm_remove($id);
-
-            $id = $this->open($size);
-        }
-        shm_put_var($id, self::SEG, $keysArray);
+        shm_put_var($id, self::SEGMENT, $keysArray);
         $this->close($id);
     }
 
     public function delete(string $key): void
     {
         $id = $this->open();
-        $keysArray = shm_get_var($id, self::SEG);
+        $keysArray = shm_get_var($id, self::SEGMENT);
 
         if (is_array($keysArray) && in_array($key, $keysArray, true)) {
             $keysArray = array_diff($keysArray, [$key]);
         }
 
-        shm_put_var($id,self::SEG, $keysArray);
+        shm_put_var($id,self::SEGMENT, $keysArray);
         $this->close($id);
     }
 
     /**
-     * @param int $size
      * @return \SysvSharedMemory
      */
-    private function open(int $size = self::SIZE)
+    private function open()
     {
         $umask = umask(0000);
-        $id = shm_attach($this->shmKey, $size, 0666);
+        $id = shm_attach($this->shmKey, self::SIZE, 0666);
         umask($umask);
 
         if (!$id) {
@@ -106,14 +97,14 @@ final class KeyBlock
                 throw new \RuntimeException($errstr);
             });
 
-            $existingKeys = shm_get_var($id, self::SEG);
+            $existingKeys = shm_get_var($id, self::SEGMENT);
 
         } catch (\RuntimeException $_e) {
         } finally {
             restore_error_handler();
         }
         if (!is_array($existingKeys)) {
-            shm_put_var($id, self::SEG, []);
+            shm_put_var($id, self::SEGMENT, []);
         }
 
         return $id;

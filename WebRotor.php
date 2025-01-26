@@ -241,7 +241,7 @@ final class WebRotor
                 $this->logger->debug('Data storage in shared RAM is automatically selected');
             } catch (WebRotorComplianceException $e) {
                 $storage = new FileStorage($this->config->getRuntimeDirectory());
-                $this->logger->debug('The file data storage is automatically selected');
+                $this->logger->debug('The file data storage is automatically selected. Cause: ' . $e->getMessage());
             }
         }
         $this->sessionManager = $this->sessionManager ?? new SessionManager($this->logger, $this->config);

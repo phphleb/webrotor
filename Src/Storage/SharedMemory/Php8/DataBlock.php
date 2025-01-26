@@ -12,9 +12,7 @@ use Phphleb\Webrotor\Src\Storage\SharedMemory\TokenGenerator;
  */
 final class DataBlock
 {
-    private const SIZE = 256;
-
-    private const SEG = 0;
+    private const SEGMENT = 0;
 
     /**
      * @var int
@@ -26,79 +24,60 @@ final class DataBlock
         $this->shmKey = TokenGenerator::createToken('value', $type, $key);
     }
 
+    /**
+     * It is assumed that the value is written once and its size is known.
+     */
     public function set(string $value): void
     {
         $value = trim($value) ?: '[]';
-        $length = (int)(strlen($value) * 1.3);
-        $id = $this->getId();
-        $realSize = max($length, self::SIZE);
+        $length = strlen($value) + 20;
+        $umask = umask(0000);
+        $id = shm_attach($this->shmKey, $length, 0666);
+        umask($umask);
         if ($id) {
-            if ($length >= self::SIZE) {
-                shm_remove($id);
-                $umask = umask(0000);
-                $id = shm_attach($this->shmKey, $realSize, 0666);
-                umask($umask);
-            }
-        } else {
-            $umask = umask(0000);
-            $id = shm_attach($this->shmKey, $realSize, 0666);
-            umask($umask);
+            shm_put_var($id, self::SEGMENT, $value);
+            shm_detach($id);
+            return;
         }
-        if ($id) {
-            shm_put_var($id, self::SEG, $value);
-        } else {
-            throw new WebRotorException('Failed to save value to memory segment');
-        }
-        $this->close($id);
+        throw new WebRotorException('Failed to save value to memory segment');
     }
 
+    /**
+     * It is assumed that the value being requested is one that has a key, so it exists.
+     */
     public function get(): ?string
     {
-        $id = $this->getId();
-        if ($id && shm_has_var($id, self::SEG)) {
-            $data = shm_get_var($id, self::SEG);
-            if (is_string($data)) {
-                return $data ?: '[]';
-            }
-            return null;
-        }
-        return null;
-    }
-
-    public function has(): bool
-    {
-        $id = $this->getId();
+        $id = shm_attach($this->shmKey, null);
+        $result = null;
         if ($id) {
-            return shm_has_var($id, self::SEG);
+            if (shm_has_var($id, self::SEGMENT)) {
+                $data = shm_get_var($id, self::SEGMENT);
+                if (is_string($data)) {
+                    $result = $data ?: '[]';
+                }
+            }
+            shm_detach($id);
         }
-        return false;
+        return $result;
     }
 
+    /**
+     * Delete only for existing data.
+     */
     public function delete(): void
     {
-        $id = $this->getId();
-        if ($id) {
-            shm_remove($id);
+        try {
+            set_error_handler(static function ($_errno, $errstr) {
+                throw new \RuntimeException($errstr);
+            });
+            $id = shm_attach($this->shmKey, null);
+            if ($id) {
+                shm_remove($id);
+                shm_detach($id);
+            }
+        } catch (\RuntimeException $_e) {
+        } finally {
+            restore_error_handler();
         }
-    }
-
-    /**
-     * @return false|\SysvSharedMemory
-     */
-    private function getId()
-    {
-        $umask = umask(0000);
-        $id = shm_attach($this->shmKey, self::SIZE, 0666);
-        umask($umask);
-
-        return $id;
-    }
-
-    /**
-     * @param \SysvSharedMemory $id
-     */
-    private function close($id): void
-    {
-        shm_detach($id);
     }
 }
