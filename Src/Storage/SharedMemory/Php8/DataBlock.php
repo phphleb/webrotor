@@ -29,7 +29,7 @@ final class DataBlock
     public function set(string $value): void
     {
         $value = trim($value) ?: '[]';
-        $length = (int)(strlen($value) * 1.2);
+        $length = (int)(strlen($value) * 1.3);
         $id = $this->getId();
         $realSize = max($length, self::SIZE);
         if ($id) {

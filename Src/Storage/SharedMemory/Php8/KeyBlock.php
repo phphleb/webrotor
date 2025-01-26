@@ -59,10 +59,11 @@ final class KeyBlock
             $keysArray = [];
         }
 
-        // Duplication of keys is possible, this needs to be processed further.
-        $keysArray[] = $key;
+        if (!in_array($key, $keysArray, true)) {
+            $keysArray[] = $key;
+        }
 
-        $size = strlen(serialize($keysArray)) * 2;
+        $size = count($keysArray) * 100;
 
         if ($size >= self::SIZE) {
             shm_remove($id);
