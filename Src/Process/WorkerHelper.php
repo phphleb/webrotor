@@ -102,6 +102,10 @@ final class WorkerHelper
                 $result[] = $tag;
             }
         }
-        return $result;
+        $counted = array_count_values($result);
+        // If there are duplicates, then get rid of them.
+        return array_filter($result, static function($value) use ($counted) {
+            return $counted[$value] === 1;
+        });
     }
 }

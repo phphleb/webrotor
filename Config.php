@@ -120,7 +120,7 @@ final class Config
      *
      * @var int
      */
-    public $workerRequestDelayMicroSec = 1000;
+    public $workerRequestDelayMicroSec = 100;
 
 
     /**

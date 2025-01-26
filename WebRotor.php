@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Phphleb\Webrotor;
 
+use Phphleb\Webrotor\Src\Exception\WebRotorComplianceException;
 use Phphleb\Webrotor\Src\Exception\WebRotorConfigException;
 use Phphleb\Webrotor\Src\Exception\WebRotorException;
 use Phphleb\Webrotor\Src\Handler\Psr7Converter;
@@ -21,6 +22,7 @@ use Phphleb\Webrotor\Src\Process\Worker;
 use Phphleb\Webrotor\Src\Log\LoggerManager;
 use Phphleb\Webrotor\Src\Session\SessionManagerInterface;
 use Phphleb\Webrotor\Src\Storage\FileStorage;
+use Phphleb\Webrotor\Src\Storage\SharedMemoryStorage;
 use Phphleb\Webrotor\Src\Storage\StorageInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -231,7 +233,17 @@ final class WebRotor
     public function init(Psr7CreatorInterface $psr7Creator): array
     {
         $this->hasInitialized = true;
-        $storage = $this->storage ?? new FileStorage($this->config->getRuntimeDirectory());
+        $storage = $this->storage;
+        if (!$storage) {
+            try {
+                // If possible, storage in RAM is used.
+                $storage = new SharedMemoryStorage();
+                $this->logger->debug('Data storage in shared RAM is automatically selected');
+            } catch (WebRotorComplianceException $e) {
+                $storage = new FileStorage($this->config->getRuntimeDirectory());
+                $this->logger->debug('The file data storage is automatically selected');
+            }
+        }
         $this->sessionManager = $this->sessionManager ?? new SessionManager($this->logger, $this->config);
         $workerCreator = $this->workerCreator ?? new TemporaryWorkerCreator($this->config, $this->logger, $storage);
 
