@@ -35,11 +35,14 @@ final class DataBlock
         if ($id) {
             if ($length >= self::SIZE) {
                 shm_remove($id);
-                $this->close($id);
+                $umask = umask(0000);
                 $id = shm_attach($this->shmKey, $realSize, 0666);
+                umask($umask);
             }
         } else {
+            $umask = umask(0000);
             $id = shm_attach($this->shmKey, $realSize, 0666);
+            umask($umask);
         }
         if ($id) {
             shm_put_var($id, self::SEG, $value);
@@ -76,7 +79,6 @@ final class DataBlock
         $id = $this->getId();
         if ($id) {
             shm_remove($id);
-            $this->close($id);
         }
     }
 
@@ -85,7 +87,11 @@ final class DataBlock
      */
     private function getId()
     {
-        return shm_attach($this->shmKey, self::SIZE, 0666);
+        $umask = umask(0000);
+        $id = shm_attach($this->shmKey, self::SIZE, 0666);
+        umask($umask);
+
+        return $id;
     }
 
     /**

@@ -67,7 +67,6 @@ final class KeyBlock
 
         if ($size >= self::SIZE) {
             shm_remove($id);
-            $this->close($id);
 
             $id = $this->open($size);
         }
@@ -94,7 +93,9 @@ final class KeyBlock
      */
     private function open(int $size = self::SIZE)
     {
+        $umask = umask(0000);
         $id = shm_attach($this->shmKey, $size, 0666);
+        umask($umask);
 
         if (!$id) {
             throw new WebRotorException('Unable to reserve block in memory segment');
