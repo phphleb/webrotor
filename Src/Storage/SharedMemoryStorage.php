@@ -32,13 +32,13 @@ final class SharedMemoryStorage implements StorageInterface
         if (PHP_OS_FAMILY === 'Windows') {
             throw new WebRotorComplianceException('This `sysvshm`-based module is not available for Windows');
         }
-        if (!function_exists('shm_attach')) {
+        if (!extension_loaded('sysvshm')) {
             throw new WebRotorComplianceException('PHP `sysvshm` extension not installed');
         }
-        if (!function_exists('sem_get')) {
+        if (!extension_loaded('sysvsem')) {
             throw new WebRotorComplianceException('PHP `sysvsem` extension not installed');
         }
-        if (!function_exists('shmop_open')) {
+        if (!extension_loaded('shmop')) {
             throw new WebRotorComplianceException('PHP `shmop` extension not installed');
         }
     }
