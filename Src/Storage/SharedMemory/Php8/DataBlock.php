@@ -36,7 +36,7 @@ final class DataBlock
             $id = shmop_open($this->shmKey, 'c', 0666, 200);
         } else {
             // Use as storage.
-            $id = @shmop_open($this->shmKey, 'n', 0666, $length);
+            $id = @shmop_open($this->shmKey, 'с', 0666, $length);
         }
         umask($umask);
         if ($id) {
