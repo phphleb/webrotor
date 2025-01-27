@@ -14,7 +14,10 @@ use Phphleb\Webrotor\Src\Storage\SharedMemory\TokenGenerator;
  */
 final class KeyBlock
 {
-    private const SIZE = 5242880; // 5 MB
+    /**
+     * @link https://www.php.net/manual/en/intro.sem.php
+     */
+    private const SIZE = 100000;
 
     private const SEG = 0;
 

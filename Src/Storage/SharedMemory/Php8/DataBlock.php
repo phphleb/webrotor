@@ -32,7 +32,7 @@ final class DataBlock
         $umask = umask(0000);
         if ($length < 150) {
             // Use as a counter.
-            $id = shmop_open($this->shmKey, 'c', 0666, 100);
+            $id = shmop_open($this->shmKey, 'c', 0666, 200);
         } else {
             // Use as storage.
             $id = shmop_open($this->shmKey, 'n', 0666, $length);
