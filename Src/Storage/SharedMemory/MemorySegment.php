@@ -18,7 +18,9 @@ final class MemorySegment
                 set_error_handler(static function ($_errno, $errstr) {
                     throw new \RuntimeException($errstr);
                 });
+                $umask = umask(0000);
                 $searchId = shmop_open($defaultKey, 'n', 0666, $length);
+                umask($umask);
             } catch (\RuntimeException $_e) {
             } finally {
                 restore_error_handler();
