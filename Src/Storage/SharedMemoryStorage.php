@@ -61,8 +61,9 @@ final class SharedMemoryStorage implements StorageInterface
     public function set(string $key, string $type, string $value): void
     {
         $this->acquire($type);
-        $this->getValuesManager($key, $type)->set($value);
-        $this->getKeysManager($type)->set($key);
+        if ($this->getValuesManager($key, $type)->set($value)) {
+            $this->getKeysManager($type)->set($key);
+        }
         $this->release($type);
     }
 

@@ -25,24 +25,25 @@ final class DataBlock
     /**
      * It is assumed that the value is written once and its size is known.
      */
-    public function set(string $value): void
+    public function set(string $value): bool
     {
         $value = trim($value) ?: '[]';
         $length = strlen($value) + 60;
         $umask = umask(0000);
         if ($length < 150) {
+            $value = str_pad($value, 150);
             // Use as a counter.
             $id = shmop_open($this->shmKey, 'c', 0666, 200);
         } else {
             // Use as storage.
-            $id = shmop_open($this->shmKey, 'n', 0666, $length);
+            $id = @shmop_open($this->shmKey, 'n', 0666, $length);
         }
         umask($umask);
         if ($id) {
-            shmop_write($id, $value, 0);
-            return;
+            $result = shmop_write($id, $value, 0);
+            return $result !== false;
         }
-        throw new WebRotorException('Failed to save value to memory segment');
+        return false;
     }
 
     /**
