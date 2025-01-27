@@ -12,8 +12,6 @@ use Phphleb\Webrotor\Src\Storage\SharedMemory\TokenGenerator;
  */
 final class DataBlock
 {
-    private const SEGMENT = 0;
-
     /**
      * @var int
      */
@@ -21,7 +19,7 @@ final class DataBlock
 
     public function __construct(string $key, string $type)
     {
-        $this->shmKey = TokenGenerator::createToken('value', $type, $key);
+        $this->shmKey = TokenGenerator::createToken(__FILE__, $type, $key);
     }
 
     /**
@@ -30,13 +28,18 @@ final class DataBlock
     public function set(string $value): void
     {
         $value = trim($value) ?: '[]';
-        $length = strlen($value) + 20;
+        $length = strlen($value) + 60;
         $umask = umask(0000);
-        $id = shm_attach($this->shmKey, $length, 0666);
+        if ($length < 150) {
+            // Use as a counter.
+            $id = shmop_open($this->shmKey, 'c', 0666, 100);
+        } else {
+            // Use as storage.
+            $id = shmop_open($this->shmKey, 'n', 0666, $length);
+        }
         umask($umask);
         if ($id) {
-            shm_put_var($id, self::SEGMENT, $value);
-            shm_detach($id);
+            shmop_write($id, $value, 0);
             return;
         }
         throw new WebRotorException('Failed to save value to memory segment');
@@ -47,16 +50,13 @@ final class DataBlock
      */
     public function get(): ?string
     {
-        $id = shm_attach($this->shmKey, null);
+        $id = shmop_open($this->shmKey, 'a', 0, 0);
         $result = null;
         if ($id) {
-            if (shm_has_var($id, self::SEGMENT)) {
-                $data = shm_get_var($id, self::SEGMENT);
-                if (is_string($data)) {
-                    $result = $data ?: '[]';
-                }
+            $data = shmop_read($id, 0, shmop_size($id));
+            if (is_string($data)) {
+                $result = trim($data) ?: '[]';
             }
-            shm_detach($id);
         }
         return $result;
     }
@@ -70,10 +70,12 @@ final class DataBlock
             set_error_handler(static function ($_errno, $errstr) {
                 throw new \RuntimeException($errstr);
             });
-            $id = shm_attach($this->shmKey, null);
+            $id = shmop_open($this->shmKey, 'a', 0, 0);
             if ($id) {
-                shm_remove($id);
-                shm_detach($id);
+                shmop_delete($id);
+                if (PHP_VERSION_ID < 80000) {
+                    shmop_close($id);
+                }
             }
         } catch (\RuntimeException $_e) {
         } finally {

@@ -14,9 +14,9 @@ use Phphleb\Webrotor\Src\Storage\SharedMemory\TokenGenerator;
  */
 final class KeyBlock
 {
-    private const SIZE = 10485760; // 10 MB
+    private const SIZE = 256;
 
-    private const SEGMENT = 0;
+    private const SEG = 0;
 
     /**
      * @var int
@@ -25,7 +25,7 @@ final class KeyBlock
 
     public function __construct(string $type)
     {
-        $this->shmKey = TokenGenerator::createToken('keys', $type);
+        $this->shmKey = TokenGenerator::createToken(__FILE__, $type);
     }
 
     /**
@@ -35,7 +35,7 @@ final class KeyBlock
     {
         $id = $this->open();
         /** @var array<string>|null $keysArray */
-        $keysArray = shm_get_var($id, self::SEGMENT);
+        $keysArray = shm_get_var($id, self::SEG);
         $this->close($id);
 
         return $keysArray ?? [];
@@ -44,7 +44,7 @@ final class KeyBlock
     public function has(string $key): bool
     {
         $id = $this->open();
-        $keysArray = shm_get_var($id, self::SEGMENT);
+        $keysArray = shm_get_var($id, self::SEG);
         $this->close($id);
 
         return is_array($keysArray) && in_array($key, $keysArray, true);
@@ -53,40 +53,47 @@ final class KeyBlock
     public function set(string $key): void
     {
         $id = $this->open();
-        $keysArray = shm_get_var($id, self::SEGMENT);
+        $keysArray = shm_get_var($id, self::SEG);
 
         if (!is_array($keysArray)) {
             $keysArray = [];
         }
 
-        if (!in_array($key, $keysArray, true)) {
-            $keysArray[] = $key;
+        // Duplication of keys is possible, this needs to be processed further.
+        $keysArray[] = $key;
+
+        $size = strlen(serialize($keysArray)) * 2;
+
+        if ($size >= self::SIZE) {
+            shm_remove($id);
+            $this->close($id);
+
+            $id = $this->open($size);
         }
-        shm_put_var($id, self::SEGMENT, $keysArray);
+        shm_put_var($id, self::SEG, $keysArray);
         $this->close($id);
     }
 
     public function delete(string $key): void
     {
         $id = $this->open();
-        $keysArray = shm_get_var($id, self::SEGMENT);
+        $keysArray = shm_get_var($id, self::SEG);
 
         if (is_array($keysArray) && in_array($key, $keysArray, true)) {
             $keysArray = array_diff($keysArray, [$key]);
         }
 
-        shm_put_var($id,self::SEGMENT, $keysArray);
+        shm_put_var($id,self::SEG, $keysArray);
         $this->close($id);
     }
 
     /**
+     * @param int $size
      * @return \SysvSharedMemory
      */
-    private function open()
+    private function open(int $size = self::SIZE)
     {
-        $umask = umask(0000);
-        $id = shm_attach($this->shmKey, self::SIZE, 0666);
-        umask($umask);
+        $id = shm_attach($this->shmKey, $size, 0666);
 
         if (!$id) {
             throw new WebRotorException('Unable to reserve block in memory segment');
@@ -97,14 +104,14 @@ final class KeyBlock
                 throw new \RuntimeException($errstr);
             });
 
-            $existingKeys = shm_get_var($id, self::SEGMENT);
+            $existingKeys = shm_get_var($id, self::SEG);
 
         } catch (\RuntimeException $_e) {
         } finally {
             restore_error_handler();
         }
         if (!is_array($existingKeys)) {
-            shm_put_var($id, self::SEGMENT, []);
+            shm_put_var($id, self::SEG, []);
         }
 
         return $id;

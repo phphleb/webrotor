@@ -28,9 +28,6 @@ final class SharedMemoryStorage implements StorageInterface
 
     public function __construct()
     {
-        if (PHP_VERSION_ID < 80000) {
-            throw new WebRotorComplianceException('This module supports PHP version >= 8.0');
-        }
         if (PHP_OS_FAMILY === 'Windows') {
             throw new WebRotorComplianceException('This `sysvshm`-based module is not available for Windows');
         }
@@ -39,6 +36,9 @@ final class SharedMemoryStorage implements StorageInterface
         }
         if (!function_exists('sem_get')) {
             throw new WebRotorComplianceException('PHP `sysvsem` extension not installed');
+        }
+        if (!function_exists('shmop_open')) {
+            throw new WebRotorComplianceException('PHP `shmop` extension not installed');
         }
     }
 
@@ -132,7 +132,7 @@ final class SharedMemoryStorage implements StorageInterface
     private function semaphore(string $type)
     {
         if (!isset($this->semaphores[$type])) {
-            $shmKey = TokenGenerator::createToken('storage', $type);
+            $shmKey = TokenGenerator::createToken(__FILE__, $type);
             $semaphore = sem_get($shmKey, 1);
             if (!$semaphore) {
                 throw new WebRotorException('Failed to set lock');

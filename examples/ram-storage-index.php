@@ -1,7 +1,6 @@
 <?php
 // Contents of your index.php file.
-// Connecting to a shared in-memory data store using the `sysvshm` and `sysvsem` PHP extensions.
-// Supports PHP version 8.0 and higher.
+// Connecting to a shared in-memory data store using the `shmop`, `sysvshm` and `sysvsem` PHP extensions.
 // Not supported for Windows.
 
 use Phphleb\Webrotor\Src\Handler\NyholmPsr7Creator;

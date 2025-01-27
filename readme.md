@@ -179,7 +179,7 @@ $server->run(function(ServerRequestInterface $request, ResponseInterface $respon
 
 ## Performance
 
-By default, public data for workers is stored in files, but if the environment meets the following conditions, this data will be placed in memory, significantly increasing performance. To achieve this, the `sysvshm` and `sysvsem` extensions must be installed, and PHP version `>= 8.0` is required.
+By default, public data for workers is stored in files, but if the environment meets the following conditions, this data will be placed in memory, significantly increasing performance. To achieve this, the `shmop`, `sysvshm` and `sysvsem` extensions must be installed.
 
 
 ## Example for Laravel 11.x
