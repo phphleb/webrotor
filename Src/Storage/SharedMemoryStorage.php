@@ -116,7 +116,7 @@ final class SharedMemoryStorage implements StorageInterface
         $this->release($type);
 
         /** @var array<string> $keys */
-        $keys = array_keys($keys);
+        $keys = array_map('strval', array_keys($keys));
 
         return $keys;
     }
