@@ -14,7 +14,7 @@ use Phphleb\Webrotor\Src\Storage\SharedMemory\TokenGenerator;
  */
 final class KeyBlock
 {
-    private const SIZE = 256;
+    private const SIZE = 5242880; // 5 MB
 
     private const SEG = 0;
 
@@ -59,17 +59,11 @@ final class KeyBlock
             $keysArray = [];
         }
 
-        // Duplication of keys is possible, this needs to be processed further.
+        if (in_array($key, $keysArray, true)) {
+            return;
+        }
         $keysArray[] = $key;
 
-        $size = strlen(serialize($keysArray)) * 2;
-
-        if ($size >= self::SIZE) {
-            shm_remove($id);
-            $this->close($id);
-
-            $id = $this->open($size);
-        }
         shm_put_var($id, self::SEG, $keysArray);
         $this->close($id);
     }
@@ -88,12 +82,11 @@ final class KeyBlock
     }
 
     /**
-     * @param int $size
      * @return \SysvSharedMemory
      */
-    private function open(int $size = self::SIZE)
+    private function open()
     {
-        $id = shm_attach($this->shmKey, $size, 0666);
+        $id = shm_attach($this->shmKey, self::SIZE, 0666);
 
         if (!$id) {
             throw new WebRotorException('Unable to reserve block in memory segment');
