@@ -6,6 +6,7 @@ namespace Phphleb\Webrotor\Src\Storage;
 
 use Phphleb\Webrotor\Src\Exception\WebRotorComplianceException;
 use Phphleb\Webrotor\Src\Exception\WebRotorException;
+use Phphleb\Webrotor\Src\Storage\SharedMemory\MemorySegment;
 use Phphleb\Webrotor\Src\Storage\SharedMemory\Php8\DataBlock;
 use Phphleb\Webrotor\Src\Storage\SharedMemory\Php8\KeyBlock;
 use Phphleb\Webrotor\Src\Storage\SharedMemory\TokenGenerator;
@@ -48,8 +49,9 @@ final class SharedMemoryStorage implements StorageInterface
     {
         $this->acquire($type);
         $data = null;
-        if ($this->getKeysManager($type)->has($key)) {
-            $data = $this->getValuesManager($key, $type)->get();
+        $searchId = $this->getKeysManager($type)->has($key);
+        if ($searchId !== null) {
+            $data = $this->getValuesManager($searchId)->get();
         }
         $this->release($type);
 
@@ -61,9 +63,21 @@ final class SharedMemoryStorage implements StorageInterface
     public function set(string $key, string $type, string $value): void
     {
         $this->acquire($type);
-        if ($this->getValuesManager($key, $type)->set($value)) {
-            $this->getKeysManager($type)->set($key);
+        $value = trim($value) ?: '[]';
+
+        if (!$this->getKeysManager($type)->has($key)) {
+            $length = strlen($value) + 60;
+            if ($length < 150) {
+                $value = str_pad($value, 150);
+                $length = 200;
+            }
+            $id = MemorySegment::getFreeSegmentFromShmop($type, $key, $length);
+
+            if ($this->getValuesManager($id)->set($value, $length)) {
+                $this->getKeysManager($type)->set($key, $id);
+            }
         }
+
         $this->release($type);
     }
 
@@ -72,8 +86,10 @@ final class SharedMemoryStorage implements StorageInterface
     public function delete(string $key, string $type): bool
     {
         $this->acquire($type);
-        $this->getKeysManager($type)->delete($key);
-        $this->getValuesManager($key, $type)->delete();
+        $searchKey = $this->getKeysManager($type)->delete($key);
+        if ($searchKey !== null) {
+            $this->getValuesManager($searchKey)->delete();
+        }
         $result = !$this->getKeysManager($type)->has($key);
         $this->release($type);
 
@@ -88,7 +104,7 @@ final class SharedMemoryStorage implements StorageInterface
         $result = $this->getKeysManager($type)->has($key);
         $this->release($type);
 
-        return $result;
+        return $result !== null;
     }
 
     /** @inheritDoc */
@@ -96,10 +112,13 @@ final class SharedMemoryStorage implements StorageInterface
     public function keys(string $type): array
     {
         $this->acquire($type);
-        $result = $this->getKeysManager($type)->all();
+        $keys = $this->getKeysManager($type)->all();
         $this->release($type);
 
-        return $result;
+        /** @var array<string> $keys */
+        $keys = array_keys($keys);
+
+        return $keys;
     }
 
     /**
@@ -116,13 +135,12 @@ final class SharedMemoryStorage implements StorageInterface
     /**
      * Returns an object for working with data by type and key.
      */
-    private function getValuesManager(string $key, string $type): DataBlock
+    private function getValuesManager(int $id): DataBlock
     {
-        $tag = $key . '_' . $type;
-        if (!array_key_exists($tag, $this->dataBlocks)) {
-            $this->dataBlocks[$tag] = new DataBlock($key, $type);
+        if (!array_key_exists($id, $this->dataBlocks)) {
+            $this->dataBlocks[$id] = new DataBlock($id);
         }
-        return $this->dataBlocks[$tag];
+        return $this->dataBlocks[$id];
     }
 
     /**
@@ -133,7 +151,7 @@ final class SharedMemoryStorage implements StorageInterface
     private function semaphore(string $type)
     {
         if (!isset($this->semaphores[$type])) {
-            $shmKey = TokenGenerator::createToken(__FILE__, $type);
+            $shmKey = TokenGenerator::createFileToken(__FILE__, $type);
             $semaphore = sem_get($shmKey, 1);
             if (!$semaphore) {
                 throw new WebRotorException('Failed to set lock');

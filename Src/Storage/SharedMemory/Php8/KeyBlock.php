@@ -28,11 +28,11 @@ final class KeyBlock
 
     public function __construct(string $type)
     {
-        $this->shmKey = TokenGenerator::createToken(__FILE__, $type);
+        $this->shmKey = TokenGenerator::createFileToken(__FILE__, $type);
     }
 
     /**
-     * @return array<string>
+     * @return array<int, string>
      */
     public function all(): array
     {
@@ -44,16 +44,20 @@ final class KeyBlock
         return $keysArray ?? [];
     }
 
-    public function has(string $key): bool
+    public function has(string $key): ?int
     {
         $id = $this->open();
         $keysArray = shm_get_var($id, self::SEG);
         $this->close($id);
 
-        return is_array($keysArray) && in_array($key, $keysArray, true);
+        if (is_array($keysArray) && array_key_exists($key, $keysArray)) {
+            return $keysArray[$key];
+        }
+
+        return null;
     }
 
-    public function set(string $key): void
+    public function set(string $key, int $token): void
     {
         $id = $this->open();
         $keysArray = shm_get_var($id, self::SEG);
@@ -62,26 +66,32 @@ final class KeyBlock
             $keysArray = [];
         }
 
-        if (in_array($key, $keysArray, true)) {
+        if (array_key_exists($key, $keysArray)) {
             return;
         }
-        $keysArray[] = $key;
+        $keysArray[$key] = $token;
 
         shm_put_var($id, self::SEG, $keysArray);
         $this->close($id);
     }
 
-    public function delete(string $key): void
+    public function delete(string $key): ?int
     {
         $id = $this->open();
         $keysArray = shm_get_var($id, self::SEG);
-
-        if (is_array($keysArray) && in_array($key, $keysArray, true)) {
-            $keysArray = array_diff($keysArray, [$key]);
+        if (!is_array($keysArray)) {
+            return null;
         }
+        if (!array_key_exists($key, $keysArray)) {
+            return null;
+        }
+        $token = $keysArray[$key];
+        unset($keysArray[$key]);
 
         shm_put_var($id,self::SEG, $keysArray);
         $this->close($id);
+
+        return $token;
     }
 
     /**

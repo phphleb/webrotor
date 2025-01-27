@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Phphleb\Webrotor\Src\Storage\SharedMemory\Php8;
 
-use Phphleb\Webrotor\Src\Exception\WebRotorException;
-use Phphleb\Webrotor\Src\Storage\SharedMemory\TokenGenerator;
-
 /**
  * @author Foma Tuturov <fomiash@yandex.ru>
  */
@@ -17,32 +14,27 @@ final class DataBlock
      */
     private $shmKey;
 
-    public function __construct(string $key, string $type)
+    public function __construct(int $shmKey)
     {
-        $this->shmKey = TokenGenerator::createToken(__FILE__, $type, $key);
+        $this->shmKey = $shmKey;
     }
 
     /**
      * It is assumed that the value is written once and its size is known.
      */
-    public function set(string $value): bool
+    public function set(string $value, int $length): bool
     {
-        $value = trim($value) ?: '[]';
-        $length = strlen($value) + 60;
         $umask = umask(0000);
-        if ($length < 150) {
-            $value = str_pad($value, 150);
-            // Use as a counter.
-            $id = shmop_open($this->shmKey, 'c', 0666, 200);
-        } else {
-            // Use as storage.
-            $id = @shmop_open($this->shmKey, 'с', 0666, $length);
-        }
+        $id = @shmop_open($this->shmKey, 'c', 0666, $length);
         umask($umask);
         if ($id) {
             $result = shmop_write($id, $value, 0);
+            if (PHP_VERSION_ID < 80000) {
+                shmop_close($id);
+            }
             return $result !== false;
         }
+
         return false;
     }
 
@@ -58,7 +50,11 @@ final class DataBlock
             if (is_string($data)) {
                 $result = trim($data) ?: '[]';
             }
+            if (PHP_VERSION_ID < 80000) {
+                shmop_close($id);
+            }
         }
+
         return $result;
     }
 

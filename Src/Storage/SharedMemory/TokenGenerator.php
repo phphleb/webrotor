@@ -9,10 +9,18 @@ namespace Phphleb\Webrotor\Src\Storage\SharedMemory;
  */
 final class TokenGenerator
 {
-  public static function createToken(string $prefix, string $type, string $key = ''): int
-  {
-      $input = $prefix . '~' . $key . '~' . $type;
+    public static function createToken(string $file, string $type, string $key = ''): int
+    {
+        $input = $file . '~' . $key . '~' . $type;
 
-      return abs(crc32($input));
-  }
+        return abs(crc32($input));
+    }
+
+    public static function createFileToken(string $file, string $type): int
+    {
+        $project = substr($type, -1);
+
+        return ftok($file, $project);
+    }
+
 }
