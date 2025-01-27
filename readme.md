@@ -177,11 +177,6 @@ $server->run(function(ServerRequestInterface $request, ResponseInterface $respon
 });
 ```
 
-## Performance
-
-By default, public data for workers is stored in files, but if the environment meets the following conditions, this data will be placed in memory, significantly increasing performance. To achieve this, the `shmop`, `sysvshm` and `sysvsem` extensions must be installed.
-
-
 ## Example for Laravel 11.x
 
 An example of basic initialization for `Laravel` 11.x can be found in this repository in the `examples/frameworks` folder.

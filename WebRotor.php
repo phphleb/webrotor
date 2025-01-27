@@ -235,14 +235,8 @@ final class WebRotor
         $this->hasInitialized = true;
         $storage = $this->storage;
         if (!$storage) {
-            try {
-                // If possible, storage in RAM is used.
-                $storage = new SharedMemoryStorage();
-                $this->logger->debug('Data storage in shared RAM is automatically selected');
-            } catch (WebRotorComplianceException $e) {
-                $storage = new FileStorage($this->config->getRuntimeDirectory());
-                $this->logger->debug('The file data storage is automatically selected');
-            }
+            $storage = new FileStorage($this->config->getRuntimeDirectory());
+            $this->logger->debug('The file data storage is automatically selected');
         }
         $this->sessionManager = $this->sessionManager ?? new SessionManager($this->logger, $this->config);
         $workerCreator = $this->workerCreator ?? new TemporaryWorkerCreator($this->config, $this->logger, $storage);
