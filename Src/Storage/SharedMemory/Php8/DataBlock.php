@@ -43,16 +43,27 @@ final class DataBlock
      */
     public function get(): ?string
     {
-        $id = shmop_open($this->shmKey, 'a', 0, 0);
         $result = null;
-        if ($id) {
-            $data = shmop_read($id, 0, shmop_size($id));
-            if (is_string($data)) {
-                $result = trim($data) ?: '[]';
+        try {
+            set_error_handler(static function ($_errno, $errstr) {
+                throw new \RuntimeException($errstr);
+            });
+            $id = shmop_open($this->shmKey, 'a', 0, 0);
+            if ($id) {
+                $data = shmop_read($id, 0, shmop_size($id));
+                if (is_string($data)) {
+                    if ($data !== '' && $data[-1] === ' ') {
+                        $data = rtrim($data);
+                    }
+                    $result = $data ?: '[]';
+                }
+                if (PHP_VERSION_ID < 80000) {
+                    shmop_close($id);
+                }
             }
-            if (PHP_VERSION_ID < 80000) {
-                shmop_close($id);
-            }
+        } catch (\RuntimeException $_e) {
+        } finally {
+            restore_error_handler();
         }
 
         return $result;

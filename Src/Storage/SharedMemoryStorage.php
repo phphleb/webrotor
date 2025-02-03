@@ -47,13 +47,13 @@ final class SharedMemoryStorage implements StorageInterface
     #[\Override]
     public function get(string $key, string $type): ?string
     {
-        $this->acquire($type);
         $data = null;
+        $this->acquire($type);
         $searchId = $this->getKeysManager($type)->has($key);
+        $this->release($type);
         if ($searchId !== null) {
             $data = $this->getValuesManager($searchId)->get();
         }
-        $this->release($type);
 
         return $data;
     }
@@ -62,23 +62,25 @@ final class SharedMemoryStorage implements StorageInterface
     #[\Override]
     public function set(string $key, string $type, string $value): void
     {
-        $this->acquire($type);
-        $value = trim($value) ?: '[]';
-
-        if (!$this->getKeysManager($type)->has($key)) {
-            $length = strlen($value) + 60;
-            if ($length < 150) {
-                $value = str_pad($value, 150);
-                $length = 200;
-            }
-            $id = MemorySegment::getFreeSegmentFromShmop($type, $key, $length);
-
-            if ($this->getValuesManager($id)->set($value, $length)) {
-                $this->getKeysManager($type)->set($key, $id);
-            }
+        $value = $value ?: '[]';
+        $length = strlen($value) + 60;
+        // Worker data.
+        if ($length < 150) {
+            $value = str_pad($value, 150);
+            $length = 200;
         }
 
+        $this->acquire($type);
+        $id = $this->getKeysManager($type)->has($key);
+        if (!$id) {
+            $id = MemorySegment::getFreeSegmentFromShmop($type, $key, $length);
+        }
         $this->release($type);
+        if ($this->getValuesManager($id)->set($value, $length)) {
+            $this->acquire($type);
+            $this->getKeysManager($type)->set($key, $id);
+            $this->release($type);
+        }
     }
 
     /** @inheritDoc */
@@ -87,13 +89,11 @@ final class SharedMemoryStorage implements StorageInterface
     {
         $this->acquire($type);
         $searchKey = $this->getKeysManager($type)->delete($key);
+        $this->release($type);
         if ($searchKey !== null) {
             $this->getValuesManager($searchKey)->delete();
         }
-        $result = !$this->getKeysManager($type)->has($key);
-        $this->release($type);
-
-        return $result;
+        return !$this->has($key, $type);
     }
 
     /** @inheritDoc */
