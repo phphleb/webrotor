@@ -52,10 +52,7 @@ final class DataBlock
             if ($id) {
                 $data = shmop_read($id, 0, shmop_size($id));
                 if (is_string($data)) {
-                    if ($data !== '' && $data[-1] === ' ') {
-                        $data = rtrim($data);
-                    }
-                    $result = $data ?: '[]';
+                    $result = trim($data) ?: '[]';
                 }
                 if (PHP_VERSION_ID < 80000) {
                     shmop_close($id);
