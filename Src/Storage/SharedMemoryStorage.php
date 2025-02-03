@@ -7,8 +7,8 @@ namespace Phphleb\Webrotor\Src\Storage;
 use Phphleb\Webrotor\Src\Exception\WebRotorComplianceException;
 use Phphleb\Webrotor\Src\Exception\WebRotorException;
 use Phphleb\Webrotor\Src\Storage\SharedMemory\MemorySegment;
-use Phphleb\Webrotor\Src\Storage\SharedMemory\Php8\DataBlock;
-use Phphleb\Webrotor\Src\Storage\SharedMemory\Php8\KeyBlock;
+use Phphleb\Webrotor\Src\Storage\SharedMemory\Storage\DataBlock;
+use Phphleb\Webrotor\Src\Storage\SharedMemory\Storage\KeyBlock;
 use Phphleb\Webrotor\Src\Storage\SharedMemory\TokenGenerator;
 
 /**

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Phphleb\Webrotor\Src\Storage\SharedMemory\Php8;
+namespace Phphleb\Webrotor\Src\Storage\SharedMemory\Storage;
 
 /**
  * @author Foma Tuturov <fomiash@yandex.ru>
