@@ -8,17 +8,20 @@ use Redis;
 use RedisException;
 
 /**
- * @author Foma Tuturov <fomiash@yandex.ru>
+ * Storage using Redis Hash for optimization.
+ * Replaces storing values as strings with hashes.
+ *
+ * Author: Foma Tuturov <fomiash@yandex.ru>
  */
 final class RedisStorage implements StorageInterface
 {
     /**
-     * @var Redis - экземпляр подключения к Redis
+     * @var Redis - Redis connection instance
      */
     private $redis;
 
     /**
-     * (!) The `phpredis` extension must be installed.
+     * The `phpredis` extension must be installed.
      */
     public function __construct(Redis $redis)
     {
@@ -32,12 +35,10 @@ final class RedisStorage implements StorageInterface
      */
     public function get(string $key, string $type): ?string
     {
-        $namespacedKey = $this->buildKey($key, $type);
+        // Using Redis hash.
+        $value = $this->redis->hGet($type, $key);
 
-        /** @var string|null|false $value */
-        $value = $this->redis->get($namespacedKey);
-
-        return $value ? (string)$value : null;
+        return $value !== false ? (string)$value : null;
     }
 
     /**
@@ -47,9 +48,8 @@ final class RedisStorage implements StorageInterface
      */
     public function set(string $key, string $type, string $value): void
     {
-        $namespacedKey = $this->buildKey($key, $type);
-
-        $this->redis->set($namespacedKey, $value);
+        // Set the value in the hash.
+        $this->redis->hSet($type, $key, $value);
     }
 
     /**
@@ -59,15 +59,9 @@ final class RedisStorage implements StorageInterface
      */
     public function delete(string $key, string $type): bool
     {
-        $namespacedKey = $this->buildKey($key, $type);
+        // Delete the key from the hash.
+        $result = (int)$this->redis->hDel($type, $key);
 
-        $result = $this->redis->del($namespacedKey);
-        if ($result === false) {
-            return false;
-        }
-        if ($result instanceof \Redis) {
-            throw new RedisException("Unexpected Redis instance returned");
-        }
         return $result > 0;
     }
 
@@ -78,10 +72,8 @@ final class RedisStorage implements StorageInterface
      */
     public function has(string $key, string $type): bool
     {
-        $namespacedKey = $this->buildKey($key, $type);
-
-        return !empty($this->redis->exists($namespacedKey));
-
+        // Check the existence of the key in the hash.
+        return (bool)$this->redis->hExists($type, $key);
     }
 
     /**
@@ -91,20 +83,33 @@ final class RedisStorage implements StorageInterface
      */
     public function keys(string $type): array
     {
-        $pattern = $this->buildKey('*', $type);
-        $keys = $this->redis->keys($pattern);
-
-        // Only real keys without namespace are returned.
-        return array_map(static function ($key) use ($type) {
-            return str_replace($type . ':', '', $key);
-        }, $keys);
+        // Get all keys in the hash.
+        return (array)$this->redis->hKeys($type);
     }
 
     /**
-     * Generates a composite key.
+     * Get all values in the hash.
+     *
+     * @param string $type Data type (hash name).
+     *
+     * @return array Array of all values.
+     * @throws RedisException
      */
-    private function buildKey(string $key, string $type): string
+    public function values(string $type): array
     {
-        return $type . ':' . $key;
+        return (array)$this->redis->hVals($type);
+    }
+
+    /**
+     * Delete the entire hash (type).
+     *
+     * @param string $type Hash name.
+     *
+     * @return bool Deletion result.
+     * @throws RedisException
+     */
+    public function deleteHash(string $type): bool
+    {
+        return (int)$this->redis->del($type) > 0;
     }
 }
