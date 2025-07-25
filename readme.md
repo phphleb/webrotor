@@ -1,6 +1,8 @@
 <div align="center">
 
-[![License: MIT](https://img.shields.io/badge/License-MIT%20(Free)-darkgreen.svg)](https://github.com/phphleb/hleb/blob/master/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT%20(Free)-31C754.svg)](https://github.com/phphleb/hleb/blob/master/LICENSE)
+[![version](https://poser.pugx.org/phphleb/webrotor/v)](https://packagist.org/packages/phphleb/webrotor)
+[![Total Downloads](https://poser.pugx.org/phphleb/webrotor/downloads)](https://packagist.org/packages/phphleb/webrotor)
 ![PHP](https://img.shields.io/badge/PHP-^7.2-blue)
 ![PHP](https://img.shields.io/badge/PHP-8-blue)
 [![build](https://github.com/phphleb/webrotor/actions/workflows/build.yml/badge.svg?event=push)](https://github.com/phphleb/webrotor/actions/workflows/build.yml)
