@@ -49,6 +49,17 @@ final class Config
     public $workerLifetimeSec = 60;
 
     /**
+     * Specifies the number of seconds after which the worker will shut down
+     * if no requests have been received during this period.
+     * If all workers go idle ahead of the scheduled restart, the application
+     * will operate without asynchronous processing until the next worker run.
+     * If the value is set to 0, no early shutdown will occur.
+     *
+     * @var non-negative-int
+     */
+    public $idleTimeoutSec = 0;
+
+    /**
      * Specifies the full path to the directory
      * for storing dynamic script data,
      * if it differs from the default.

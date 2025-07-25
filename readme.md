@@ -185,6 +185,13 @@ An example of basic initialization for `Laravel` 11.x can be found in this repos
 
 With broader access to the server environment, there's the potential to replace the current worker data storage with a Redis-based storage to maximize performance. An example of such a setup can be found in the `examples` folder.
 
+## Simulating Serverless for Asynchronous Processing
+
+If you need to distribute the load and want your asynchronous worker to remain active only when there are incoming requests, use the `idleTimeoutSec` configuration parameter to shut down the worker early when it becomes idle. If all workers are shut down ahead of time, the application will run without asynchronous processing until the workers are started again according to their schedule.
+
+For example, if the `idleTimeoutSec` is set to 10 seconds, after handling a request, the worker will wait for 10 seconds for new requests; if none arrive during this time, it will shut down.
+
+
 
 ## Local Development
 

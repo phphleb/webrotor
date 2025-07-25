@@ -117,6 +117,11 @@ final class InternalConfig
      */
     private $responseDelayWaitMicroSec;
 
+    /**
+     * @var int
+     */
+    private $idleTimeoutSec;
+
     public function __construct(
         string $indexFilePath,
         float  $startUnixTime,
@@ -137,7 +142,8 @@ final class InternalConfig
         string $interpreterPathPattern,
         int    $codeVersion,
         int    $workerRequestDelayMicroSec,
-        int    $responseDelayWaitMicroSec
+        int    $responseDelayWaitMicroSec,
+        int    $idleTimeoutSec
     )
     {
         if ($workerNum < 0) {
@@ -169,6 +175,9 @@ final class InternalConfig
         }
         if ($responseDelayWaitMicroSec < 0) {
             throw new WebRotorConfigException('The process delay value should not be less than zero');
+        }
+        if ($idleTimeoutSec < 0) {
+            throw new WebRotorConfigException('The idle timeout value should not be less than zero');
         }
         if ($timeZone === '') {
             $timeZone = date_default_timezone_get();
@@ -211,6 +220,7 @@ final class InternalConfig
         $this->codeVersion = $codeVersion;
         $this->workerRequestDelayMicroSec = $workerRequestDelayMicroSec;
         $this->responseDelayWaitMicroSec = $responseDelayWaitMicroSec;
+        $this->idleTimeoutSec = $idleTimeoutSec;
     }
 
     /**
@@ -409,5 +419,14 @@ final class InternalConfig
     public function getResponseDelayWaitMicroSec(): int
     {
         return $this->responseDelayWaitMicroSec;
+    }
+
+    /**
+     * Specifies the number of seconds after which the worker will shut down
+     * if no requests have been received during this period.
+     */
+    public function getIdleTimeoutSec(): int
+    {
+        return $this->idleTimeoutSec;
     }
 }

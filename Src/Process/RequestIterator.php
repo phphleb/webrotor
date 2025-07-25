@@ -70,6 +70,16 @@ final class RequestIterator implements Iterator
      */
     private $sessionManager;
 
+    /**
+     * @var int
+     */
+    private $idleTimeout;
+
+    /**
+     * @var int
+     */
+    private $idleMaxTimeout;
+
     public function __construct(
         StorageInterface                $storage,
         InternalConfig                  $config,
@@ -85,6 +95,8 @@ final class RequestIterator implements Iterator
         $this->converter = $converter;
         $this->workerCreator = $workerCreator;
         $this->sessionManager = $sessionManager;
+        $this->idleTimeout = $this->config->getIdleTimeoutSec();
+        $this->idleMaxTimeout = $this->idleTimeout + (int)$this->config->getStartUnixTime();
     }
 
     /**
@@ -149,6 +161,11 @@ final class RequestIterator implements Iterator
             // If the lifetime for a worker or temporary worker has expired, the search ends.
             if ($time >= $start + ($this->config->isTemporaryWorker() ? $tempMax : $max)) {
                 $this->logger->debug('(W) Worker #{id} lifetime has expired and the process is terminated.', ['id' => $id]);
+                return false;
+            }
+
+            if ($this->idleTimeout && $time >= $this->idleMaxTimeout) {
+                $this->logger->debug('(W) Worker #{id} idle timeout exceeded, the process is terminated.', ['id' => $id]);
                 return false;
             }
 
@@ -219,6 +236,7 @@ final class RequestIterator implements Iterator
                  */
                 $array = json_decode((string)$data, true);
                 if ($array) {
+                    $this->idleMaxTimeout += $this->idleTimeout;
                     $this->sessionManager->clean();
                     $this->request = $this->converter->convertArrayToServerRequest($array);
                 }

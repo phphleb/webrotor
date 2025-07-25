@@ -399,7 +399,8 @@ final class WebRotor
             $interpreterPathPattern,
             $config->codeVersion,
             $config->workerRequestDelayMicroSec,
-            $config->responseDelayWaitMicroSec
+            $config->responseDelayWaitMicroSec,
+            $config->idleTimeoutSec
         );
     }
 }
