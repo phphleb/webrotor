@@ -203,7 +203,7 @@ php index.php
 ```
 
 This will initiate a single worker for the duration specified in the configuration.  
-If the worker is not running or has been disabled, your project will still function, but requests will be processed in the standard, non-synchronous mode.
+If the worker is not running or has been disabled, your project will still function, but requests will be processed in the standard, non-asynchronous mode.
 As a result, using workers is optional for local development.
 
 
