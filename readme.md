@@ -133,7 +133,7 @@ Here's how to do that:
 use Phphleb\Webrotor\Config;
 
 $config = new Config();
-$config->logLevel = 'warning'; // Logging level according to PSR-3.
+$config->logLevel = 'warning'; // Logging max level according to PSR-3.
 $config->workerNum = 2; // Number of workers.
 $config->workerLifetimeSec = 120; // Worker lifetime is two minutes.
 
