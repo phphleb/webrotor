@@ -42,7 +42,7 @@ Use [Composer](https://getcomposer.org/):
 
 
 ```bash
-composer require phphleb/webrotor
+composer require phphleb/webrotor --no-dev
 ```
 
 Next, you need to install one of the PHP HTTP client implementations for PSR-7.
