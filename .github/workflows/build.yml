@@ -51,7 +51,7 @@ jobs:
         run: cd ${{ env.TARGET_DIR }} && composer require phphleb/webrotor --with-dependencies
 
       - name: Install phpstan
-        run: cd ${{ env.TARGET_DIR }} && composer require phpstan/phpstan --with-dependencies
+        run: cd ${{ env.TARGET_DIR }} && composer require phpstan/phpstan --with-dependencies --dev
 
       - name: Install tests
         run:  cd ${{ env.TARGET_DIR }} && composer require phphleb/webrotor-tests --with-dependencies
@@ -63,7 +63,7 @@ jobs:
         run:  cd ${{ env.TARGET_DIR }} && composer dump-autoload
 
       - name: Run phpstan
-        run: ${{ env.TARGET_DIR }}/vendor/bin/phpstan analyse --configuration=phpstan.neon
+        run: ${{ env.TARGET_DIR }}/vendor/bin/phpstan analyse --configuration=./${{ env.TARGET_DIR }}/phpstan.neon
 
       - name: Run start tests
         run: php ${{ env.TARGET_DIR }}/vendor/bin/phpunit --configuration=${{ env.TARGET_DIR }}/phpunit.xml --testsuite start
