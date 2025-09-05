@@ -24,7 +24,10 @@
         "ext-json": "*"
     },
     "require-dev": {
-        "phpstan/phpstan": "^1.12"
+        "phpstan/phpstan": "^1.12",
+        "nyholm/psr7": "@stable",
+        "nyholm/psr7-server": "@stable",
+        "guzzlehttp/guzzle": "@stable"
     },
     "autoload": {
         "psr-4": {

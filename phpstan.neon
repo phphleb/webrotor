@@ -1,6 +1,7 @@
 parameters:
       level: max
       paths:
-          - .
+          - Src
+          - examples
       excludePaths:
           - examples/frameworks

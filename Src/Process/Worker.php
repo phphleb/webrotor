@@ -159,7 +159,7 @@ final class Worker
     {
         $responseArray = $this->converter->convertResponseToArray($response, $request);
 
-        $this->storage->set($tag, self::RESPONSE_BODY_TYPE, $responseArray['body'] ?? '');
+        $this->storage->set($tag, self::RESPONSE_BODY_TYPE, $responseArray['body']);
 
         unset($responseArray['body']);
 

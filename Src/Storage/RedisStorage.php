@@ -92,7 +92,7 @@ final class RedisStorage implements StorageInterface
      *
      * @param string $type Data type (hash name).
      *
-     * @return array Array of all values.
+     * @return array<mixed> Array of all values.
      * @throws RedisException
      */
     public function values(string $type): array
