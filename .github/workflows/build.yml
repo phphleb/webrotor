@@ -50,7 +50,8 @@ jobs:
       - name: Install webrotor
         run: cd ${{ env.TARGET_DIR }} && composer require phphleb/webrotor --with-dependencies
 
-      - name: Install phpstan
+      - name: Установка phpstan
+        if: ${{ startsWith(matrix.php, '8')}}
         run: cd ${{ env.TARGET_DIR }} && composer require phpstan/phpstan:"^1.12" --with-dependencies --dev
 
       - name: Install tests
@@ -63,6 +64,7 @@ jobs:
         run:  cd ${{ env.TARGET_DIR }} && composer dump-autoload
 
       - name: Run phpstan
+        if: ${{ startsWith(matrix.php, '8')}}
         run: ${{ env.TARGET_DIR }}/vendor/bin/phpstan analyse --configuration=${{ env.TARGET_DIR }}/vendor/phphleb/webrotor/phpstan.neon
 
       - name: Run start tests
