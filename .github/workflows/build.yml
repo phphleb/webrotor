@@ -51,7 +51,7 @@ jobs:
         run: cd ${{ env.TARGET_DIR }} && composer require phphleb/webrotor --with-dependencies
 
       - name: Install phpstan
-        run: cd ${{ env.TARGET_DIR }} && composer require phpstan/phpstan --with-dependencies --dev
+        run: cd ${{ env.TARGET_DIR }} && composer require phpstan/phpstan:"^1.12" --with-dependencies --dev
 
       - name: Install tests
         run:  cd ${{ env.TARGET_DIR }} && composer require phphleb/webrotor-tests --with-dependencies
