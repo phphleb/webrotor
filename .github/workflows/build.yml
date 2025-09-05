@@ -63,7 +63,7 @@ jobs:
         run:  cd ${{ env.TARGET_DIR }} && composer dump-autoload
 
       - name: Run phpstan
-        run: ${{ env.TARGET_DIR }}/vendor/bin/phpstan analyse --configuration=${{ env.TARGET_DIR }}/phpstan.neon
+        run: ${{ env.TARGET_DIR }}/vendor/bin/phpstan analyse --configuration=${{ env.TARGET_DIR }}/vendor/phphleb/webrotor/phpstan.neon
 
       - name: Run start tests
         run: php ${{ env.TARGET_DIR }}/vendor/bin/phpunit --configuration=${{ env.TARGET_DIR }}/phpunit.xml --testsuite start
