@@ -11,7 +11,6 @@ jobs:
 
     env:
       extensions: json, pdo, xml
-      DIR: wr-php${{ matrix.php }}-${{ matrix.os }}
       TARGET_DIR: ${{ github.workspace }}/wr-php${{ matrix.php }}-${{ matrix.os }}
 
     runs-on: ${{ matrix.os }}
@@ -64,7 +63,7 @@ jobs:
         run:  cd ${{ env.TARGET_DIR }} && composer dump-autoload
 
       - name: Run phpstan
-        run: ${{ env.TARGET_DIR }}/vendor/bin/phpstan analyse --configuration=${{ env.DIR }}/phpstan.neon
+        run: ${{ env.TARGET_DIR }}/vendor/bin/phpstan analyse --configuration=${{ env.TARGET_DIR }}/phpstan.neon
 
       - name: Run start tests
         run: php ${{ env.TARGET_DIR }}/vendor/bin/phpunit --configuration=${{ env.TARGET_DIR }}/phpunit.xml --testsuite start
