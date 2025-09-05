@@ -203,7 +203,9 @@ final class RequestIterator implements Iterator
             }
             $responseTag = $responseKeys[$tag] ?? null;
             if ($responseTag && !$this->config->isDebug()) {
-                if (!$this->storage->delete($responseTag, Worker::RESPONSE_TYPE)) {
+                $deleteResponse = $this->storage->delete($responseTag, Worker::RESPONSE_TYPE);
+                $deleteResponseBody = $this->storage->delete($responseTag, Worker::RESPONSE_BODY_TYPE);
+                if (!$deleteResponse || !$deleteResponseBody) {
                     // Was taken away by a competing process.
                     continue;
                 }

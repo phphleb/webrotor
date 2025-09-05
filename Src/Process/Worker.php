@@ -27,6 +27,8 @@ final class Worker
 
     public const RESPONSE_TYPE = 'response';
 
+    public const RESPONSE_BODY_TYPE = 'response_body';
+
     public const WORKER_TYPE = 'worker';
 
     /**
@@ -155,9 +157,13 @@ final class Worker
      */
     public function setResponse(string $tag, ResponseInterface $response, ServerRequestInterface $request): void
     {
-        $this->storage->set(
-            $tag, self::RESPONSE_TYPE, (string)json_encode(($this->converter->convertResponseToArray($response, $request)))
-        );
+        $responseArray = $this->converter->convertResponseToArray($response, $request);
+
+        $this->storage->set($tag, self::RESPONSE_BODY_TYPE, $responseArray['body'] ?? '');
+
+        unset($responseArray['body']);
+
+        $this->storage->set($tag, self::RESPONSE_TYPE, (string)json_encode($responseArray));
     }
 
     /**
