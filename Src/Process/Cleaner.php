@@ -64,7 +64,7 @@ final class Cleaner
     private function cleanResources(): void
     {
         $startTime = $this->config->getStartUnixTime();
-        foreach ([Worker::REQUEST_TYPE, Worker::RESPONSE_TYPE] as $type) {
+        foreach ([Worker::REQUEST_TYPE, Worker::RESPONSE_TYPE, Worker::RESPONSE_BODY_TYPE] as $type) {
             foreach ($this->worker->getStorage()->keys($type) as $key) {
                 if (WorkerHelper::checkIsOlder($key, $type, $startTime)) {
                     $this->logger->debug('(A) Expired content removed {type} {key}', ['type' => $type, 'key' => $key]);

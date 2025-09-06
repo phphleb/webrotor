@@ -93,6 +93,9 @@ final class ResponseSearchEngine
                 throw new WebRotorException("(S) The received server response {$tag} is empty");
             }
             $responseBody = $this->storage->get($tag, Worker::RESPONSE_BODY_TYPE);
+            if ($responseBody === null) {
+                throw new WebRotorException("(S) The received server response body {$tag} is empty");
+            }
             $this->storage->delete($tag, Worker::REQUEST_TYPE);
             if (!$this->config->isDebug()) {
                 $this->storage->delete($tag, Worker::RESPONSE_TYPE);
@@ -127,7 +130,7 @@ final class ResponseSearchEngine
 
             /** For backward compatibility with versions where the full Request object is in JSON. */
             if (!array_key_exists('body', $data)) {
-                $data['body'] = $responseBody ?? '';
+                $data['body'] = $responseBody;
             }
 
             return $data;

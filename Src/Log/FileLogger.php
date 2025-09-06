@@ -27,6 +27,11 @@ final class FileLogger extends AbstractLogger
      */
     private $logDirExists = false;
 
+    /**
+     * @var bool
+     */
+    private $errorOutput = false;
+
     public function __construct(InternalConfig $config)
     {
         $this->config = $config;
@@ -58,8 +63,12 @@ final class FileLogger extends AbstractLogger
             return;
         }
 
-        if (!$this->logDirExists && !is_dir($logDirectory) && !@mkdir($logDirectory, 0777, true) && !is_dir($logDirectory)) {
-            throw new WebRotorException(sprintf('Directory "%s" was not created', $logDirectory));
+        if (!$this->logDirExists && !is_dir($logDirectory) && !mkdir($logDirectory, 0777, true) && !is_dir($logDirectory)) {
+            if (!$this->errorOutput) {
+                $this->errorOutput = true;
+                throw new WebRotorException(sprintf('Directory "%s" was not created. Set the necessary permissions or create the directory manually.', $logDirectory));
+            }
+            return;
         }
         $this->logDirExists = true;
 

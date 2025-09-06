@@ -85,7 +85,11 @@ final class WorkerHelper
                 $normalized[] = $segment;
             }
         }
-        return '/' . trim(implode('/', $normalized), '/');
+        $resultPath = trim(implode(DIRECTORY_SEPARATOR, $normalized), '/');
+        if (stripos(PHP_OS, 'WIN') !== 0) {
+            $resultPath = DIRECTORY_SEPARATOR . $path;
+        }
+        return $resultPath;
     }
 
     /**
