@@ -72,7 +72,7 @@ final class Config
     public $runtimeDirectory = null;
 
     /**
-     * Points to the directory with web server logs.
+     * Full path to the directory with web server logs.
      * Only for default file logs.
      *
      * @var null|string

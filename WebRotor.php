@@ -341,10 +341,10 @@ final class WebRotor
         $runtimeDirectory = $config->runtimeDirectory;
         $logDirectory = $config->logDirectory;
         if (empty($runtimeDirectory)) {
-            $runtimeDirectory = $publicDirectory . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . self::RUNTIME_DIR;
+            $runtimeDirectory = dirname($publicDirectory) . DIRECTORY_SEPARATOR . self::RUNTIME_DIR;
         }
         if (empty($logDirectory)) {
-            $logDirectory = $publicDirectory . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . self::LOGS_DIR;
+            $logDirectory = dirname($publicDirectory) . DIRECTORY_SEPARATOR . self::LOGS_DIR;
         }
 
         $isTemporaryWorker = false;
