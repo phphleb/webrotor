@@ -19,8 +19,6 @@ class WebRotorException extends RuntimeException
     public static $logger = null;
 
 
-
-
     /**
      * @param string $message
      * @param int $code

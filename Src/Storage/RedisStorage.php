@@ -13,7 +13,7 @@ use RedisException;
  *
  * Author: Foma Tuturov <fomiash@yandex.ru>
  */
-final class RedisStorage implements StorageInterface
+class RedisStorage implements StorageInterface
 {
     /**
      * @var Redis - Redis connection instance
